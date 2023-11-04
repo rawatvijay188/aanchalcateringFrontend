@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+
 import Form from "react-bootstrap/Form";
 import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
 import Stack from "react-bootstrap/Stack";
+import lambdaCall from "../helper/LambdaCall";
 
 const MenuTable = () => {
   const [editableRow, setEditableRow] = useState(null);
@@ -16,10 +17,8 @@ const MenuTable = () => {
 
   useEffect(() => {
     async function fetchMenuCategories() {
-      var response = await axios({
-        method: "POST",
-        url: "http://localhost:3000/dev/cateringService",
-        data: { service: "get_unique_menu_categories" },
+      var response = await lambdaCall({
+        service: "get_unique_menu_categories",
       });
       setMenuCategories(response.data);
     }
@@ -28,13 +27,9 @@ const MenuTable = () => {
   async function fetchMenuData(selectedCategory) {
     setSelectedCategory(selectedCategory);
     setEditableRow(null);
-    var response = await axios({
-      method: "POST",
-      url: "http://localhost:3000/dev/cateringService",
-      data: {
-        service: "get_menu_items_by_category",
-        category: selectedCategory,
-      },
+    var response = await lambdaCall({
+      service: "get_menu_items_by_category",
+      category: selectedCategory,
     });
     reset();
     setMenuData(response.data);
@@ -162,11 +157,7 @@ const MenuTable = () => {
   };
   async function updateAll() {
     for (let i = 0; i < updatedMenuDataList.length; i++) {
-      await axios({
-        method: "POST",
-        url: "http://localhost:3000/dev/cateringService",
-        data: updatedMenuDataList[i],
-      });
+      await lambdaCall(updatedMenuDataList[i]);
     }
   }
   const handleSubmit = async () => {

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import Form from "react-bootstrap/Form";
 import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
 import Stack from "react-bootstrap/Stack";
+import lambdaCall from "../helper/LambdaCall";
 
 const IngredientTable = () => {
   const [editableRow, setEditableRow] = useState([]);
@@ -16,10 +16,8 @@ const IngredientTable = () => {
   const [oldData, setOldData] = useState({});
   useEffect(() => {
     async function fetchIngredientsCategories() {
-      var response = await axios({
-        method: "POST",
-        url: "http://localhost:3000/dev/cateringService",
-        data: { service: "get_unique_ingredient_categories" },
+      var response = await lambdaCall({
+        service: "get_unique_ingredient_categories",
       });
       setIngredientsCategories(response.data);
     }
@@ -28,13 +26,9 @@ const IngredientTable = () => {
   async function fetchIngredientsData(selectedCategory) {
     setSelectedCategory(selectedCategory);
     setEditableRow(null);
-    var response = await axios({
-      method: "POST",
-      url: "http://localhost:3000/dev/cateringService",
-      data: {
-        service: "get_ingredients_by_category",
-        category: selectedCategory,
-      },
+    var response = await lambdaCall({
+      service: "get_ingredients_by_category",
+      category: selectedCategory,
     });
     setUpdatedIngredientsDataList([]);
     setIngredientData(response.data);
@@ -165,11 +159,7 @@ const IngredientTable = () => {
   };
   async function updateAll() {
     for (let i = 0; i < updatedIngredientsDataList.length; i++) {
-      await axios({
-        method: "POST",
-        url: "http://localhost:3000/dev/cateringService",
-        data: updatedIngredientsDataList[i],
-      });
+      await lambdaCall(updatedIngredientsDataList[i]);
     }
   }
   const handleItemSubmit = async () => {

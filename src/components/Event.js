@@ -20,7 +20,12 @@ function Event(props) {
             </Card>
           </Col>
           <Col key={"updateEvent"}>
-            <Card>
+            <Card
+              onClick={(e) => {
+                e.preventDefault();
+                props.setTabValue(5);
+              }}
+            >
               {/* <Card.Img variant="top" src="holder.js/100px160" /> */}
               <Card.Body>
                 <Card.Title>Update Event</Card.Title>

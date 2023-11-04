@@ -5,6 +5,7 @@ import NavigationBar from "./NavigationBar";
 import MenuTable from "./menuTable";
 import IngredientTable from "./ingredientsTable";
 import AddEventForm from "./AddEventForm";
+import UpdateEventForm from "./UpdateEventForm";
 
 function Home() {
   const [tabValue, setTabValue] = useState(0);
@@ -14,10 +15,11 @@ function Home() {
       <br />
       <div className="container">
         {tabValue === 0 && <MenuAndIngredients setTabValue={setTabValue} />}
-        {tabValue === 1 && <Event setTabValue={setTabValue}/>}
+        {tabValue === 1 && <Event setTabValue={setTabValue} />}
         {tabValue === 2 && <MenuTable />}
         {tabValue === 3 && <IngredientTable />}
-        {tabValue === 4 && <AddEventForm  />}
+        {tabValue === 4 && <AddEventForm />}
+        {tabValue === 5 && <UpdateEventForm />}
       </div>
     </>
   );
