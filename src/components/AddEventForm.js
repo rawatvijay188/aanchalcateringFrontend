@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+
 const AddEventForm = () => {
   const [formData, setFormData] = useState({
     eventTitle: "",
@@ -10,7 +13,7 @@ const AddEventForm = () => {
     venue: "",
     bookingDate: "",
     functionDate: "",
-    time: "",
+    functionTime: "",
     numberOfPersons: "",
     mobileNumber: "",
     bookingAmount: "",
@@ -21,8 +24,8 @@ const AddEventForm = () => {
   });
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    const { id, value } = e.target;
+    setFormData({ ...formData, [id]: value });
   };
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -35,7 +38,7 @@ const AddEventForm = () => {
       "venue",
       "bookingDate",
       "functionDate",
-      "time",
+      "functionTime",
       "numberOfPersons",
       "mobileNumber",
       "bookingAmount",
@@ -43,7 +46,7 @@ const AddEventForm = () => {
       "balance",
       "note",
     ];
-
+    console.log(formData);
     // Check if all mandatory fields are filled
     const emptyFields = mandatoryFields.filter((field) => !formData[field]);
 
@@ -62,258 +65,146 @@ const AddEventForm = () => {
     // If all mandatory fields are filled, proceed with form submission
     console.log("Form submitted:", formData);
   };
-
   return (
-    <Form>
-      <Form.Group className="mb-3" controlId="eventTitle">
-        <Form.Label>Event Title</Form.Label>
-        <Form.Control type="text" placeholder="Enter Event Title" />
-      </Form.Group>
-      <Form.Group className="mb-3" controlId="organizerName">
-        <Form.Label>Name of Organizer</Form.Label>
-        <Form.Control type="text" placeholder="Enter Organizer Name" />
-      </Form.Group>
-      <Form.Group className="mb-3" controlId="eventType">
-        <Form.Label>Event Type</Form.Label>
-        <Form.Control type="text" placeholder="Enter Event Type" />
-      </Form.Group>
-      <Form.Group className="mb-3" controlId="address">
-        <Form.Label>Address</Form.Label>
-        <Form.Control as="textarea" rows={3} placeholder="Enter Address" />
-      </Form.Group>
-      <Form.Group className="mb-3" controlId="venue">
-        <Form.Label>Venue</Form.Label>
-        <Form.Control type="text" placeholder="Enter Venue" />
-      </Form.Group>
-      <Form.Group className="mb-3" controlId="bookingDate">
-        <Form.Label>Date of Booking</Form.Label>
-        <Form.Control type="date" placeholder="Enter Booking Date" />
-      </Form.Group>
-      <Form.Group className="mb-3" controlId="functionDate">
-        <Form.Label>Date of Function</Form.Label>
-        <Form.Control type="date" placeholder="Enter Event Date" />
-      </Form.Group>
-      <Form.Group className="mb-3" controlId="functionTime">
-        <Form.Label>Function Time</Form.Label>
-        <Form.Control type="time" placeholder="Enter Function time" />
-      </Form.Group>
-      <Form.Group className="mb-3" controlId="numberOfPersons">
-        <Form.Label>Number of Persons</Form.Label>
-        <Form.Control type="number" placeholder="Enter Person Count" />
-      </Form.Group>
-      <Form.Group className="mb-3" controlId="mobileNumber">
-        <Form.Label>Mobile Number</Form.Label>
-        <Form.Control type="text" placeholder="Enter Mobile Number" />
-      </Form.Group>
-      <Form.Group className="mb-3" controlId="bookingAmount">
-        <Form.Label>Booking Amount</Form.Label>
-        <Form.Control type="text" placeholder="Enter Booking Amount" />
-      </Form.Group>
-      <Form.Group className="mb-3" controlId="advance">
-        <Form.Label>Advance</Form.Label>
-        <Form.Control type="text" placeholder="Enter Advance" />
-      </Form.Group>
-      <Form.Group className="mb-3" controlId="balance">
-        <Form.Label>Balance</Form.Label>
-        <Form.Control type="text" placeholder="Enter Balance" />
-      </Form.Group>
-      <Form.Group className="mb-3" controlId="pricePerPlate">
-        <Form.Label>Price Per Plate</Form.Label>
-        <Form.Control type="text" placeholder="Enter Price Per Plate" />
-      </Form.Group>
+    <Form onSubmit={handleSubmit}>
+      <Row className="mb-3">
+        <Form.Group as={Col} controlId="eventTitle">
+          <Form.Label>Event Title</Form.Label>
+          <Form.Control
+            type="text"
+            onChange={handleChange}
+            name="eventTitle"
+            placeholder="Enter Event Title"
+          />
+        </Form.Group>
+        <Form.Group as={Col} controlId="organizerName">
+          <Form.Label>Name of Organizer</Form.Label>
+          <Form.Control
+            type="text"
+            onChange={handleChange}
+            placeholder="Enter Organizer Name"
+          />
+        </Form.Group>
+      </Row>
+      <Row className="mb-3">
+        <Col>
+          <Form.Group controlId="eventType">
+            <Form.Label>Event Type</Form.Label>
+            <Form.Control
+              type="text"
+              onChange={handleChange}
+              placeholder="Enter Event Type"
+            />
+          </Form.Group>
+          <Form.Group controlId="venue">
+            <Form.Label>Venue</Form.Label>
+            <Form.Control
+              type="text"
+              onChange={handleChange}
+              placeholder="Enter Venue"
+            />
+          </Form.Group>
+        </Col>
+        <Form.Group as={Col} controlId="address">
+          <Form.Label>Address</Form.Label>
+          <Form.Control
+            as="textarea"
+            rows={4}
+            onChange={handleChange}
+            placeholder="Enter Address"
+          />
+        </Form.Group>
+      </Row>
+      <Row className="mb-3">
+        <Form.Group as={Col} controlId="bookingDate">
+          <Form.Label>Date of Booking</Form.Label>
+          <Form.Control
+            type="date"
+            onChange={handleChange}
+            placeholder="Enter Booking Date"
+          />
+        </Form.Group>
+        <Form.Group as={Col} controlId="functionDate">
+          <Form.Label>Date of Function</Form.Label>
+          <Form.Control
+            type="date"
+            onChange={handleChange}
+            placeholder="Enter Event Date"
+          />
+        </Form.Group>
+        <Form.Group as={Col} controlId="functionTime">
+          <Form.Label>Function Time</Form.Label>
+          <Form.Control
+            type="time"
+            onChange={handleChange}
+            placeholder="Enter Function time"
+          />
+        </Form.Group>
+      </Row>
+      <Row className="mb-3">
+        <Form.Group as={Col} controlId="mobileNumber">
+          <Form.Label>Mobile Number</Form.Label>
+          <Form.Control
+            type="text"
+            onChange={handleChange}
+            placeholder="Enter Mobile Number"
+          />
+        </Form.Group>
+        <Form.Group as={Col} controlId="numberOfPersons">
+          <Form.Label>Number of Persons</Form.Label>
+          <Form.Control
+            type="number"
+            onChange={handleChange}
+            placeholder="Enter Person Count"
+          />
+        </Form.Group>
+        <Form.Group as={Col} controlId="pricePerPlate">
+          <Form.Label>Price Per Plate</Form.Label>
+          <Form.Control
+            type="text"
+            onChange={handleChange}
+            placeholder="Enter Price Per Plate"
+          />
+        </Form.Group>
+      </Row>
+      <Row className="mb-3">
+        <Form.Group as={Col} controlId="bookingAmount">
+          <Form.Label>Booking Amount</Form.Label>
+          <Form.Control
+            type="text"
+            onChange={handleChange}
+            placeholder="Enter Booking Amount"
+          />
+        </Form.Group>
+        <Form.Group as={Col} controlId="advance">
+          <Form.Label>Advance</Form.Label>
+          <Form.Control
+            type="text"
+            onChange={handleChange}
+            placeholder="Enter Advance"
+          />
+        </Form.Group>
+        <Form.Group as={Col} controlId="balance">
+          <Form.Label>Balance</Form.Label>
+          <Form.Control
+            type="text"
+            onChange={handleChange}
+            placeholder="Enter Balance"
+          />
+        </Form.Group>
+      </Row>
       <Form.Group className="mb-3" controlId="note">
         <Form.Label>Note</Form.Label>
-        <Form.Control type="text" placeholder="Enter Additional Info" />
+        <Form.Control
+          type="text"
+          onChange={handleChange}
+          placeholder="Enter Additional Info"
+        />
       </Form.Group>
       <Button variant="primary" type="submit">
         Submit
       </Button>
     </Form>
-    //   <form onSubmit={handleSubmit}>
-    //     <div>
-    //       <label htmlFor="eventTitle">Event Title*</label>
-    //       <input
-    //         type="text"
-    //         id="eventTitle"
-    //         name="eventTitle"
-    //         value={formData.eventTitle}
-    //         onChange={handleChange}
-    //         required
-    //       />
-    //     </div>
-
-    //     <div>
-    //       <label htmlFor="organizerName">Name of Organizer*</label>
-    //       <input
-    //         type="text"
-    //         id="organizerName"
-    //         name="organizerName"
-    //         value={formData.organizerName}
-    //         onChange={handleChange}
-    //         required
-    //       />
-    //     </div>
-
-    //     <div>
-    //       <label htmlFor="eventType">Event Type*</label>
-    //       <input
-    //         type="text"
-    //         id="eventType"
-    //         name="eventType"
-    //         value={formData.eventType}
-    //         onChange={handleChange}
-    //         required
-    //         // Add any additional attributes or placeholders as needed
-    //       />
-    //     </div>
-
-    //     {/* Add similar blocks for other input fields */}
-    //     <div>
-    //       <label htmlFor="address">Address*</label>
-    //       <input
-    //         type="text"
-    //         id="address"
-    //         name="address"
-    //         value={formData.address}
-    //         onChange={handleChange}
-    //         required
-    //       />
-    //     </div>
-
-    //     <div>
-    //       <label htmlFor="venue">Venue*</label>
-    //       <input
-    //         type="text"
-    //         id="venue"
-    //         name="venue"
-    //         value={formData.venue}
-    //         onChange={handleChange}
-    //         required
-    //       />
-    //     </div>
-
-    //     <div>
-    //       <label htmlFor="bookingDate">Date of Booking*</label>
-    //       <input
-    //         type="date"
-    //         id="bookingDate"
-    //         name="bookingDate"
-    //         value={formData.bookingDate}
-    //         onChange={handleChange}
-    //         required
-    //       />
-    //     </div>
-
-    //     <div>
-    //       <label htmlFor="functionDate">Date of Function*</label>
-    //       <input
-    //         type="date"
-    //         id="functionDate"
-    //         name="functionDate"
-    //         value={formData.functionDate}
-    //         onChange={handleChange}
-    //         required
-    //       />
-    //     </div>
-
-    //     <div>
-    //       <label htmlFor="time">Time*</label>
-    //       <input
-    //         type="time"
-    //         id="time"
-    //         name="time"
-    //         value={formData.time}
-    //         onChange={handleChange}
-    //         required
-    //       />
-    //     </div>
-
-    //     <div>
-    //       <label htmlFor="numberOfPersons">Number of Persons*</label>
-    //       <input
-    //         type="text"
-    //         id="numberOfPersons"
-    //         name="numberOfPersons"
-    //         value={formData.numberOfPersons}
-    //         onChange={handleChange}
-    //         required
-    //       />
-    //     </div>
-
-    //     <div>
-    //       <label htmlFor="mobileNumber">Mobile Number*</label>
-    //       <input
-    //         type="text"
-    //         id="mobileNumber"
-    //         name="mobileNumber"
-    //         value={formData.mobileNumber}
-    //         onChange={handleChange}
-    //         required
-    //       />
-    //     </div>
-
-    //     <div>
-    //       <label htmlFor="bookingAmount">Booking Amount*</label>
-    //       <input
-    //         type="text"
-    //         id="bookingAmount"
-    //         name="bookingAmount"
-    //         value={formData.bookingAmount}
-    //         onChange={handleChange}
-    //         required
-    //       />
-    //     </div>
-
-    //     <div>
-    //       <label htmlFor="advance">Advance*</label>
-    //       <input
-    //         type="text"
-    //         id="advance"
-    //         name="advance"
-    //         value={formData.advance}
-    //         onChange={handleChange}
-    //         required
-    //       />
-    //     </div>
-
-    //     <div>
-    //       <label htmlFor="balance">Balance*</label>
-    //       <input
-    //         type="text"
-    //         id="balance"
-    //         name="balance"
-    //         value={formData.balance}
-    //         onChange={handleChange}
-    //         required
-    //       />
-    //     </div>
-
-    //     <div>
-    //       <label htmlFor="pricePerPlate">Price Per Plate*</label>
-    //       <input
-    //         type="text"
-    //         id="pricePerPlate"
-    //         name="pricePerPlate"
-    //         value={formData.pricePerPlate}
-    //         onChange={handleChange}
-    //         required
-    //       />
-    //     </div>
-
-    //     <div>
-    //       <label htmlFor="note">Note</label>
-    //       <textarea
-    //         id="note"
-    //         name="note"
-    //         value={formData.note}
-    //         onChange={handleChange}
-    //       />
-    //     </div>
-
-    //     <div>
-    //       <button type="submit">Submit</button>
-    //     </div>
-    //   </form>
   );
 };
 
