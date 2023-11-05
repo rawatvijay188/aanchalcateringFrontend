@@ -4,6 +4,7 @@ import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import lambdaCall from "../helper/LambdaCall";
+
 const AddEventForm = () => {
   const [validated, setValidated] = useState(false);
 
@@ -26,6 +27,11 @@ const AddEventForm = () => {
   });
 
   const handleChange = (e) => {
+    const { id, value } = e.target;
+    setFormData({ ...formData, [id]: value });
+  };
+
+  const handleDateChange = (e) => {
     const { id, value } = e.target;
     setFormData({ ...formData, [id]: value });
   };
@@ -52,6 +58,7 @@ const AddEventForm = () => {
           formData["note"],
         ],
       };
+      console.log(body);
       await lambdaCall(body);
       console.log("Added Event Details");
     }
@@ -149,7 +156,7 @@ const AddEventForm = () => {
           <Form.Label>Date of Booking</Form.Label>
           <Form.Control
             type="date"
-            onChange={handleChange}
+            onChange={handleDateChange}
             placeholder="Enter Booking Date"
             required
           />
@@ -162,7 +169,7 @@ const AddEventForm = () => {
           <Form.Label>Date of Function</Form.Label>
           <Form.Control
             type="date"
-            onChange={handleChange}
+            onChange={handleDateChange}
             placeholder="Enter Event Date"
             required
           />

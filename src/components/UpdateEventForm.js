@@ -8,11 +8,14 @@ import lambdaCall from "../helper/LambdaCall";
 import IngredientsIcon from "../static/images/ingredient-small.png";
 import MenuIcon from "../static/images/mneu-small.png";
 import Stack from "react-bootstrap/Stack";
-const UpdateEventForm = () => {
+import moment from "moment/moment";
+
+const UpdateEventForm = (props) => {
   const [formData, setFormData] = useState(null);
   const [eventDetails, setEventDetails] = useState([]);
   const [editableRow, setEditableRow] = useState(null);
   const [oldData, setOldData] = useState({});
+  const [changeCheck, setChangeCheck] = useState(false);
   const handleFormChange = (e) => {
     const { id, value } = e.target;
     if (value) {
@@ -24,38 +27,81 @@ const UpdateEventForm = () => {
     }
   };
   const toggleEdit = (index) => {
+    setChangeCheck(false);
     setEditableRow(index);
     var updatedData = { ...eventDetails[index] };
     setOldData(updatedData);
   };
   async function fetchEventDetails() {
+    console.log({
+      service: "eventFilter",
+      filter: formData,
+    });
     var data = await lambdaCall({
       service: "eventFilter",
       filter: formData,
     });
-    console.log(data.data);
     setEventDetails(data.data);
   }
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log(formData);
     fetchEventDetails();
   };
-  const handleSave = (index) => {
+  const handleSave = async (index) => {
     setEditableRow(null);
+    if (changeCheck) {
+      var updatedData = { ...eventDetails[index] };
+      var id = updatedData["id"];
+      delete updatedData["id"];
+      var body = {
+        service: "update_event",
+        newEventData: updatedData,
+        id: id,
+      };
+      await lambdaCall(body);
+    }
+    refresh();
   };
-
+  const handleDelete = async (index) => {
+    var id = eventDetails[index]["id"];
+    var body = { service: "delete_event", id: id };
+    await lambdaCall(body);
+    refresh();
+  };
   const cancelEdit = (index) => {
     setEditableRow(null);
     var updatedData = [...eventDetails];
-    console.log(oldData);
     updatedData[index] = oldData;
     setEventDetails(updatedData);
+    setChangeCheck(false);
   };
   const handleTableChange = (e, index, field) => {
     const updatedData = [...eventDetails];
     updatedData[index][field] = e.target.value;
     setEventDetails(updatedData);
+    setChangeCheck(true);
+  };
+  const clearForm = () => {
+    setFormData(null);
+    setEventDetails([]);
+    setEditableRow(null);
+    setOldData({});
+    setChangeCheck(false);
+    document.getElementById("event_title").value = "";
+    document.getElementById("organizer").value = "";
+    document.getElementById("event_type").value = "";
+    document.getElementById("venue").value = "";
+    document.getElementById("address").value = "";
+    document.getElementById("mobile_number").value = "";
+    document.getElementById("date_of_booking").value = "";
+    document.getElementById("date_of_function").value = "";
+  };
+  const refresh = () => {
+    setEventDetails([]);
+    setEditableRow(null);
+    setOldData({});
+    setChangeCheck(false);
+    fetchEventDetails();
   };
   return (
     <>
@@ -137,9 +183,14 @@ const UpdateEventForm = () => {
             />
           </Form.Group>
         </Row>
-        <Button variant="primary" type="submit">
-          Submit
-        </Button>
+        <Stack gap={2} direction="horizontal" className="col-md-2 mx-auto">
+          <Button variant="primary" type="submit">
+            Submit
+          </Button>
+          <Button variant="primary" onClick={() => clearForm()}>
+            Clear
+          </Button>
+        </Stack>
       </Form>
       {eventDetails && eventDetails.length > 0 && (
         <Table striped bordered hover responsive>
@@ -155,6 +206,7 @@ const UpdateEventForm = () => {
               <th>Organizer Name</th>
               <th>Mobile Numbder</th>
               <th>Address</th>
+              <th>Number Of Persons</th>
               <th>Booking Amount</th>
               <th>Advance</th>
               <th>Balance</th>
@@ -188,14 +240,16 @@ const UpdateEventForm = () => {
                 <td>
                   {editableRow === itemIndex ? (
                     <input
-                      type="text"
-                      value={item.date_of_function}
+                      type="date"
+                      value={moment(new Date(item.date_of_function)).format(
+                        "YYYY-MM-DD"
+                      )}
                       onChange={(e) =>
                         handleTableChange(e, itemIndex, "date_of_function")
                       }
                     />
                   ) : (
-                    item.date_of_function
+                    moment(new Date(item.date_of_function)).format("DD-MM-YYYY")
                   )}
                 </td>
                 <td>
@@ -225,14 +279,16 @@ const UpdateEventForm = () => {
                 <td>
                   {editableRow === itemIndex ? (
                     <input
-                      type="text"
-                      value={item.date_of_booking}
+                      type="date"
+                      value={moment(new Date(item.date_of_booking)).format(
+                        "YYYY-MM-DD"
+                      )}
                       onChange={(e) =>
                         handleTableChange(e, itemIndex, "date_of_booking")
                       }
                     />
                   ) : (
-                    item.date_of_booking
+                    moment(new Date(item.date_of_booking)).format("DD-MM-YYYY")
                   )}
                 </td>
                 <td>
@@ -272,6 +328,19 @@ const UpdateEventForm = () => {
                     />
                   ) : (
                     item.address
+                  )}
+                </td>
+                <td>
+                  {editableRow === itemIndex ? (
+                    <input
+                      type="number"
+                      value={item.number_of_person}
+                      onChange={(e) =>
+                        handleTableChange(e, itemIndex, "number_of_person")
+                      }
+                    />
+                  ) : (
+                    item.number_of_person
                   )}
                 </td>
                 <td>
@@ -323,7 +392,11 @@ const UpdateEventForm = () => {
                     src={MenuIcon}
                     width="30"
                     height="30"
-                    alt="ingredient_icon"
+                    alt="menu_icon"
+                    onClick={() => {
+                      props.setTabValue(6);
+                      props.setEventId(item.id);
+                    }}
                   />
                 </td>
                 <td
@@ -428,6 +501,7 @@ const UpdateEventForm = () => {
                     fill="currentColor"
                     className="bi bi-trash"
                     viewBox="0 0 16 16"
+                    onClick={(e) => handleDelete(itemIndex)}
                   >
                     <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z" />
                     <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z" />
