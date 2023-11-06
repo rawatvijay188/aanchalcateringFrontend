@@ -7,6 +7,7 @@ import lambdaCall from "../helper/LambdaCall";
 
 function UpdateEventMenuForm(props) {
   const [allMenuItems, setAllMenuItems] = useState([]);
+  const [allMenuCategory, setAllMenuCategory] = useState([]);
   const [menuCategories, setMenuCategories] = useState([]);
   const [selectedMenuCategories, setSelectedMenuCategories] = useState([]);
   const [menuItems, setMenuItems] = useState([]);
@@ -26,19 +27,11 @@ function UpdateEventMenuForm(props) {
       });
       var menuDataResponse = await lambdaCall({ service: "getAllMenuItems" });
       menuDataResponse = menuDataResponse.data;
-      var allMenu = {};
-      for (let i = 0; i < menuDataResponse.length; i++) {
-        var category = menuDataResponse[i]["category"];
-        var item = menuDataResponse[i]["item"];
-        if (Object.keys(allMenu).includes(category)) {
-          allMenu[category].push(item);
-        } else {
-          allMenu[category] = [item];
-        }
-      }
-      setAllMenuItems(allMenu);
+      setAllMenuItems(menuDataResponse);
       let eventMenuData = eventMenuDataResponse.data[0]["menu"];
-      let menuCategories = Object.keys(allMenu);
+      let menuCategories = menuDataResponse.map((item) => item.category);
+      menuCategories = [...new Set(menuCategories)];
+      setAllMenuCategory(menuCategories.sort());
       if (eventMenuData) {
         eventMenuData = Object.keys(eventMenuData);
         let filterMenuCategories = menuCategories.filter(
@@ -53,12 +46,29 @@ function UpdateEventMenuForm(props) {
     fetchMenuCategories();
   }, [props.eventId]);
 
+  const formatResult = () => {
+    var allMenu = {};
+    for (let i = 0; i < selectedMenuItems.length; i++) {
+      var category = selectedMenuItems[i]["category"];
+      var item = selectedMenuItems[i]["item"];
+      if (Object.keys(allMenu).includes(category)) {
+        allMenu[category].push(item);
+      } else {
+        allMenu[category] = [item];
+      }
+    }
+
+    if (Object.keys(allMenu).length > 0) {
+      return JSON.stringify(allMenu);
+    }
+    return "";
+  };
   const handleMenuRight = () => {
     let selectedCategories = [...selectedMenuCategories];
     for (const option of selectedItemsBoxOne) {
       selectedCategories.push(option);
     }
-    let categories = Object.keys(allMenuItems);
+    let categories = allMenuCategory;
     categories = categories.filter((x) => !selectedCategories.includes(x));
     setMenuCategories(categories.sort());
     setSelectedMenuCategories(selectedCategories.sort());
@@ -72,7 +82,7 @@ function UpdateEventMenuForm(props) {
     for (const option of selectedItemsBoxTwo) {
       selectedCategories.splice(selectedCategories.indexOf(option), 1);
     }
-    let categories = Object.keys(allMenuItems);
+    let categories = allMenuCategory;
     categories = categories.filter((x) => !selectedCategories.includes(x));
     setMenuCategories(categories.sort());
     setSelectedMenuCategories(selectedCategories.sort());
@@ -82,6 +92,8 @@ function UpdateEventMenuForm(props) {
   };
   const handleMultiSelectOne = (e) => {
     document.getElementById("selected_menu_categories").selectedIndex = -1;
+    document.getElementById("all_menu_items").selectedIndex = -1;
+    document.getElementById("selected_menu_items").selectedIndex = -1;
     let options = e.target.options;
     let selectedItemsBoxOne = [];
     for (const option of options) {
@@ -93,6 +105,8 @@ function UpdateEventMenuForm(props) {
   };
   const handleMultiSelectTwo = (e) => {
     document.getElementById("menu_categories").selectedIndex = -1;
+    document.getElementById("all_menu_items").selectedIndex = -1;
+    document.getElementById("selected_menu_items").selectedIndex = -1;
     let options = e.target.options;
     let selectedItemsBoxTwo = [];
     for (const option of options) {
@@ -102,26 +116,34 @@ function UpdateEventMenuForm(props) {
     }
     setSelectedItemsBoxTwo(selectedItemsBoxTwo);
     let selectedOption = e.target.value;
-    let menuItems = [...allMenuItems[selectedOption]];
-    setMenuItems(menuItems.sort());
+    let allItems = [...allMenuItems];
+    allItems = allItems.filter((item) => item.category === selectedOption);
+    allItems.sort((a, b) => a.item.localeCompare(b.item));
+    setMenuItems(allItems.sort());
     setSelectedMenu(selectedOption);
   };
   const handleMultiSelectThree = (e) => {
+    document.getElementById("menu_categories").selectedIndex = -1;
+    document.getElementById("selected_menu_items").selectedIndex = -1;
+    document.getElementById("selected_menu_categories").selectedIndex = -1;
     let options = e.target.options;
     let selectedItemsBoxThree = [];
     for (const option of options) {
       if (option.selected) {
-        selectedItemsBoxThree.push(option.value);
+        selectedItemsBoxThree.push(JSON.parse(option.value));
       }
     }
     setSelectedItemsBoxThree(selectedItemsBoxThree);
   };
   const handleMultiSelectFour = (e) => {
+    document.getElementById("menu_categories").selectedIndex = -1;
+    document.getElementById("all_menu_items").selectedIndex = -1;
+    document.getElementById("selected_menu_categories").selectedIndex = -1;
     let options = e.target.options;
     let selectedItemsBoxFour = [];
     for (const option of options) {
       if (option.selected) {
-        selectedItemsBoxFour.push(option.value);
+        selectedItemsBoxFour.push(JSON.parse(option.value));
       }
     }
     setSelectedItemsBoxFour(selectedItemsBoxFour);
@@ -131,23 +153,40 @@ function UpdateEventMenuForm(props) {
     for (const option of selectedItemsBoxThree) {
       selectedItems.push(option);
     }
-    var updatedItems = [...allMenuItems[selectedMenu]];
-    updatedItems = updatedItems.filter((x) => !selectedItems.includes(x));
-    setMenuItems(updatedItems.sort());
-    setSelectedMenuItems(selectedItems.sort());
+    let allItems = [...allMenuItems];
+    allItems = allItems.filter(
+      (item) =>
+        item.category === selectedMenu &&
+        !selectedItems.some((i) => i.id === item.id)
+    );
+    console.log(allItems);
+    allItems.sort((a, b) => a.item.localeCompare(b.item));
+    setMenuItems(allItems);
+    setSelectedMenuItems(
+      selectedItems.sort((a, b) => a.item.localeCompare(b.item))
+    );
+
     document.getElementById("all_menu_items").selectedIndex = -1;
     document.getElementById("selected_menu_items").selectedIndex = -1;
   };
   const handleItemLeft = () => {
     var selectedItems = [...selectedMenuItems];
-    for (const option of selectedItemsBoxFour) {
-      selectedItems.splice(selectedItems.indexOf(option), 1);
-    }
+    console.log(selectedItems);
+    selectedItems = selectedItems.filter(
+      (item) => !selectedItemsBoxFour.some((i) => i.id === item.id)
+    );
+    let allItems = [...allMenuItems];
+    allItems = allItems.filter(
+      (item) =>
+        item.category === selectedMenu &&
+        !selectedItems.some((i) => i.id === item.id)
+    );
+    allItems.sort((a, b) => a.item.localeCompare(b.item));
+    setMenuItems(allItems);
+    setSelectedMenuItems(
+      selectedItems.sort((a, b) => a.item.localeCompare(b.item))
+    );
 
-    var updatedItems = [...allMenuItems[selectedMenu]];
-    updatedItems = updatedItems.filter((x) => !selectedItems.includes(x));
-    setMenuItems(updatedItems.sort());
-    setSelectedMenuItems(selectedItems.sort());
     document.getElementById("all_menu_items").selectedIndex = -1;
     document.getElementById("selected_menu_items").selectedIndex = -1;
   };
@@ -249,8 +288,8 @@ function UpdateEventMenuForm(props) {
               {menuItems &&
                 menuItems.length > 0 &&
                 menuItems.map((item, itemIndex) => (
-                  <option key={itemIndex} value={item}>
-                    {item}
+                  <option key={itemIndex} value={JSON.stringify(item)}>
+                    {item.item}
                   </option>
                 ))}
             </Form.Select>
@@ -309,13 +348,22 @@ function UpdateEventMenuForm(props) {
               {selectedMenuItems &&
                 selectedMenuItems.length > 0 &&
                 selectedMenuItems.map((item, itemIndex) => (
-                  <option key={itemIndex} value={item}>
-                    {item}
+                  <option key={itemIndex} value={JSON.stringify(item)}>
+                    {item.item}
                   </option>
                 ))}
             </Form.Select>
           </Col>
         </Row>
+        {selectedMenuItems && (
+          <Form.Control
+            as="textarea"
+            rows={4}
+            onChange={() => console.log("")}
+            value={formatResult()}
+            readOnly
+          />
+        )}
       </Container>
     </>
   );
