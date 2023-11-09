@@ -137,7 +137,6 @@ const MenuTable = () => {
       }
     }
     setUpdateMenuDataList(updatedDataList);
-    console.log(updatedMenuDataList);
     setEditableRow(null);
   };
   const handleSortItems = () => {
@@ -161,7 +160,6 @@ const MenuTable = () => {
     }
   }
   const handleSubmit = async () => {
-    console.log(updatedMenuDataList);
     const isEditing = editableRow !== null;
     const isEmptyItem = menuData.some((category) => category.item === "");
     if (isEditing) {

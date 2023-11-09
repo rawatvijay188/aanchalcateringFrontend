@@ -33,10 +33,6 @@ const UpdateEventForm = (props) => {
     setOldData(updatedData);
   };
   async function fetchEventDetails() {
-    console.log({
-      service: "eventFilter",
-      filter: formData,
-    });
     var data = await lambdaCall({
       service: "eventFilter",
       filter: formData,
