@@ -11,16 +11,25 @@ import Button from "react-bootstrap/Button";
 function UpdateEventMenuForm(props) {
   const [allMenuItems, setAllMenuItems] = useState([]);
   const [allMenuCategory, setAllMenuCategory] = useState([]);
+
   const [menuCategories, setMenuCategories] = useState([]);
+  const [filteredMenuCategories, setFilteredMenuCategories] = useState([]);
+
   const [selectedMenuCategories, setSelectedMenuCategories] = useState([]);
+  const [filteredSelectedMenuCategories, setfilteredSelectedMenuCategories] = useState([]);
+
   const [menuItems, setMenuItems] = useState([]);
+  const [filteredMenuItems, setFilteredMenuItems] = useState([]);
+
   const [selectedMenuItems, setSelectedMenuItems] = useState([]);
+  const [filteredSelectedMenuItems, setFilteredSelectedMenuItems] = useState([]);
+
   const [selectedMenu, setSelectedMenu] = useState([]);
   const [selectedItemsBoxOne, setSelectedItemsBoxOne] = useState([]);
   const [selectedItemsBoxTwo, setSelectedItemsBoxTwo] = useState([]);
   const [selectedItemsBoxThree, setSelectedItemsBoxThree] = useState([]);
   const [selectedItemsBoxFour, setSelectedItemsBoxFour] = useState([]);
-  // const [selectedMenuTableData, setSelectedMenuTableData] = useState([]);
+
 
   useEffect(() => {
     async function fetchMenuCategories() {
@@ -32,12 +41,10 @@ function UpdateEventMenuForm(props) {
       var menuDataResponse = await lambdaCall({ service: "getAllMenuItems" });
       menuDataResponse = menuDataResponse.data;
       setAllMenuItems(menuDataResponse);
-      console.log(eventMenuDataResponse);
       let eventMenuData = eventMenuDataResponse.data[0]["menu"];
       let menuCategories = menuDataResponse.map((item) => item.category);
       menuCategories = [...new Set(menuCategories)];
       setAllMenuCategory(menuCategories.sort());
-      console.log(eventMenuData);
       if (eventMenuData) {
         setSelectedMenuItems(eventMenuData);
         menuCategories = menuCategories.filter((item) =>
@@ -60,7 +67,18 @@ function UpdateEventMenuForm(props) {
     }
     fetchMenuCategories();
   }, [props.eventId]);
-
+  useEffect(() => {
+    setFilteredMenuCategories(menuCategories);
+  }, [menuCategories])
+  useEffect(() => {
+    setfilteredSelectedMenuCategories(selectedMenuCategories);
+  }, [selectedMenuCategories])
+  useEffect(() => {
+    setFilteredMenuItems(menuItems);
+  }, [menuItems])
+  useEffect(() => {
+    setFilteredSelectedMenuItems(selectedMenuItems);
+  }, [selectedMenuItems])
   // const formatResult = (selectedItems) => {
   //   var allMenu = {};
   //   for (let i = 0; i < selectedItems.length; i++) {
@@ -74,6 +92,54 @@ function UpdateEventMenuForm(props) {
   //   }
   //   return allMenu;
   // };
+
+  const menuCategoriesFilter = (e) => {
+    var value = e.target.value.toLowerCase()
+
+    var allItems = menuCategories
+
+    var filteredItems = [];
+    if (value === "") {
+      setFilteredMenuCategories(menuCategories);
+    }
+    else {
+      filteredItems = allItems.filter(x => x.toLowerCase().includes(value));
+      setFilteredMenuCategories(filteredItems);
+    }
+  }
+  const selectedMenuCategoriesFilter = (e) => {
+    var value = e.target.value.toLowerCase()
+    var filteredItems = [];
+    if (value === "") {
+      setfilteredSelectedMenuCategories(selectedMenuCategories);
+    }
+    else {
+      filteredItems = selectedMenuCategories.filter(x => x.toLowerCase().includes(value));
+      setfilteredSelectedMenuCategories(filteredItems);
+    }
+  }
+  const menuItemsFilter = (e) => {
+    var value = e.target.value.toLowerCase()
+    var filteredItems = [];
+    if (value === "") {
+      setFilteredMenuItems(menuItems);
+    }
+    else {
+      filteredItems = menuItems.filter(x => x.item.toLowerCase().includes(value));
+      setFilteredMenuItems(filteredItems);
+    }
+  }
+  const selectedMenuItemsFilter = (e) => {
+    var value = e.target.value.toLowerCase()
+    var filteredItems = [];
+    if (value === "") {
+      setFilteredSelectedMenuItems(selectedMenuItems);
+    }
+    else {
+      filteredItems = selectedMenuItems.filter(x => x.item.toLowerCase().includes(value));
+      setFilteredSelectedMenuItems(filteredItems);
+    }
+  }
   const handleMenuRight = () => {
     let selectedCategories = [...selectedMenuCategories];
     for (const option of selectedItemsBoxOne) {
@@ -214,23 +280,23 @@ function UpdateEventMenuForm(props) {
   };
 
   const handleSubmit = async () => {
-    var response = await lambdaCall({
+    await lambdaCall({
       service: "update_event",
       newEventData: {
         menu: selectedMenuItems,
       },
       id: props.eventId,
     });
-    console.log(response.data);
     alert("Updated Menu Items successfully");
   };
   return (
     <>
       <Container>
         <Stack gap={2}>
+          <div className="col-md-4 mx-auto"><h1 >View/Update Menu</h1></div>
           <Row xs="auto">
             <Col>
-              <Form.Control type="text" placeholder="Search" />
+              <Form.Control type="text" placeholder="Search" onKeyUp={(e) => menuCategoriesFilter(e)} />
               <Form.Select
                 aria-label="Default select example"
                 multiple
@@ -240,9 +306,9 @@ function UpdateEventMenuForm(props) {
                   handleMultiSelectOne(e);
                 }}
               >
-                {menuCategories &&
-                  menuCategories.length > 0 &&
-                  menuCategories.map((item, itemIndex) => (
+                {filteredMenuCategories &&
+                  filteredMenuCategories.length > 0 &&
+                  filteredMenuCategories.map((item, itemIndex) => (
                     <option key={itemIndex} value={item}>
                       {item}
                     </option>
@@ -261,11 +327,11 @@ function UpdateEventMenuForm(props) {
                   onClick={() => handleMenuRight()}
                 >
                   <path
-                    fill-rule="evenodd"
+                    fillRule="evenodd"
                     d="M3.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L9.293 8 3.646 2.354a.5.5 0 0 1 0-.708z"
                   />
                   <path
-                    fill-rule="evenodd"
+                    fillRule="evenodd"
                     d="M7.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L13.293 8 7.646 2.354a.5.5 0 0 1 0-.708z"
                   />
                 </svg>
@@ -281,18 +347,18 @@ function UpdateEventMenuForm(props) {
                   onClick={() => handleMenuLeft()}
                 >
                   <path
-                    fill-rule="evenodd"
+                    fillRule="evenodd"
                     d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"
                   />
                   <path
-                    fill-rule="evenodd"
+                    fillRule="evenodd"
                     d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"
                   />
                 </svg>
               </Row>
             </Col>
             <Col>
-              <Form.Control type="text" placeholder="Search" />
+              <Form.Control type="text" placeholder="Search" onChange={(e) => selectedMenuCategoriesFilter(e)} />
               <Form.Select
                 aria-label="Default select example"
                 multiple
@@ -302,9 +368,9 @@ function UpdateEventMenuForm(props) {
                   handleMultiSelectTwo(e);
                 }}
               >
-                {selectedMenuCategories &&
-                  selectedMenuCategories.length > 0 &&
-                  selectedMenuCategories.map((item, itemIndex) => (
+                {filteredSelectedMenuCategories &&
+                  filteredSelectedMenuCategories.length > 0 &&
+                  filteredSelectedMenuCategories.map((item, itemIndex) => (
                     <option key={itemIndex} value={item}>
                       {item}
                     </option>
@@ -312,7 +378,7 @@ function UpdateEventMenuForm(props) {
               </Form.Select>
             </Col>
             <Col>
-              <Form.Control type="text" placeholder="Search" />
+              <Form.Control type="text" placeholder="Search" onKeyUp={(e) => menuItemsFilter(e)} />
               <Form.Select
                 aria-label="Default select example"
                 multiple
@@ -320,9 +386,9 @@ function UpdateEventMenuForm(props) {
                 id="all_menu_items"
                 onChange={(e) => handleMultiSelectThree(e)}
               >
-                {menuItems &&
-                  menuItems.length > 0 &&
-                  menuItems.map((item, itemIndex) => (
+                {filteredMenuItems &&
+                  filteredMenuItems.length > 0 &&
+                  filteredMenuItems.map((item, itemIndex) => (
                     <option key={itemIndex} value={JSON.stringify(item)}>
                       {item.item}
                     </option>
@@ -341,11 +407,11 @@ function UpdateEventMenuForm(props) {
                   onClick={() => handleItemRight()}
                 >
                   <path
-                    fill-rule="evenodd"
+                    fillRule="evenodd"
                     d="M3.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L9.293 8 3.646 2.354a.5.5 0 0 1 0-.708z"
                   />
                   <path
-                    fill-rule="evenodd"
+                    fillRule="evenodd"
                     d="M7.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L13.293 8 7.646 2.354a.5.5 0 0 1 0-.708z"
                   />
                 </svg>
@@ -361,18 +427,18 @@ function UpdateEventMenuForm(props) {
                   onClick={() => handleItemLeft()}
                 >
                   <path
-                    fill-rule="evenodd"
+                    fillRule="evenodd"
                     d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"
                   />
                   <path
-                    fill-rule="evenodd"
+                    fillRule="evenodd"
                     d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"
                   />
                 </svg>
               </Row>
             </Col>
             <Col>
-              <Form.Control type="text" placeholder="Search" />
+              <Form.Control type="text" placeholder="Search" onKeyUp={(e) => selectedMenuItemsFilter(e)} />
               <Form.Select
                 aria-label="Default select example"
                 multiple
@@ -380,9 +446,9 @@ function UpdateEventMenuForm(props) {
                 id="selected_menu_items"
                 onChange={(e) => handleMultiSelectFour(e)}
               >
-                {selectedMenuItems &&
-                  selectedMenuItems.length > 0 &&
-                  selectedMenuItems.map((item, itemIndex) => (
+                {filteredSelectedMenuItems &&
+                  filteredSelectedMenuItems.length > 0 &&
+                  filteredSelectedMenuItems.map((item, itemIndex) => (
                     <option key={itemIndex} value={JSON.stringify(item)}>
                       {item.item}
                     </option>

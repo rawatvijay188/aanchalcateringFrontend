@@ -8,6 +8,7 @@ import AddEventForm from "./AddEventForm";
 import UpdateEventForm from "./UpdateEventForm";
 import UpdateEventMenuForm from "./UpdateEventMenuForm";
 import MenuAndIngredients from "./MenuAndIngredients";
+import UpdateEventIngredientsForm from "./UpdateEventIngredientsForm";
 
 function Home() {
   const [tabValue, setTabValue] = useState(0);
@@ -27,6 +28,7 @@ function Home() {
         )}
         {tabValue === 6 && <UpdateEventMenuForm eventId={eventId} />}
         {tabValue === 7 && <EventDetails  />}
+        {tabValue === 8 && <UpdateEventIngredientsForm  eventId={eventId}/>}
       </div>
     </>
   );

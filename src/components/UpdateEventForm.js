@@ -406,6 +406,10 @@ const UpdateEventForm = (props) => {
                     width="30"
                     height="35"
                     alt="ingredient_icon"
+                    onClick={() => {
+                      props.setTabValue(8);
+                      props.setEventId(item.id);
+                    }}
                   />
                 </td>
                 <td
