@@ -25,6 +25,7 @@ function UpdateEventMenuForm(props) {
   const [filteredSelectedMenuItems, setFilteredSelectedMenuItems] = useState([]);
 
   const [selectedMenu, setSelectedMenu] = useState([]);
+
   const [selectedItemsBoxOne, setSelectedItemsBoxOne] = useState([]);
   const [selectedItemsBoxTwo, setSelectedItemsBoxTwo] = useState([]);
   const [selectedItemsBoxThree, setSelectedItemsBoxThree] = useState([]);
@@ -46,7 +47,6 @@ function UpdateEventMenuForm(props) {
       menuCategories = [...new Set(menuCategories)];
       setAllMenuCategory(menuCategories.sort());
       if (eventMenuData) {
-        setSelectedMenuItems(eventMenuData);
         menuCategories = menuCategories.filter((item) =>
           eventMenuData.some((i) => i.category !== item)
         );
@@ -79,19 +79,6 @@ function UpdateEventMenuForm(props) {
   useEffect(() => {
     setFilteredSelectedMenuItems(selectedMenuItems);
   }, [selectedMenuItems])
-  // const formatResult = (selectedItems) => {
-  //   var allMenu = {};
-  //   for (let i = 0; i < selectedItems.length; i++) {
-  //     var category = selectedItems[i]["category"];
-  //     var item = selectedItems[i]["item"];
-  //     if (Object.keys(allMenu).includes(category)) {
-  //       allMenu[category].push(item);
-  //     } else {
-  //       allMenu[category] = [item];
-  //     }
-  //   }
-  //   return allMenu;
-  // };
 
   const menuCategoriesFilter = (e) => {
     var value = e.target.value.toLowerCase()

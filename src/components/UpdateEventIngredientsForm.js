@@ -10,10 +10,32 @@ import Button from "react-bootstrap/Button";
 
 function UpdateEventIngredientsForm(props) {
   const [ingredientsObj, setIngredientsObj] = useState([]);
-  const [allIngredientCategoriesCache, setAllIngredientCategoriesCache] = useState([])
-  const [allIngredientCategories, setAllIngredientCategories] = useState([])
-  const [filteredAllIngredientCategories, setFilteredAllIngredientCategories] = useState([])
+  const [allIngredientCategoriesCache, setAllIngredientCategoriesCache] =
+    useState([]);
+  const [allIngredientCategories, setAllIngredientCategories] = useState([]);
 
+  const [filteredAllIngredientCategories, setFilteredAllIngredientCategories] =
+    useState([]);
+  const [selectedIngredientCategories, setSelectedIngredientCategories] =
+    useState([]);
+  const [
+    filteredSelectedIngredientCategories,
+    setFilteredSelectedIngredientCategories,
+  ] = useState([]);
+
+  const [allIngredientItems, setAllIngredientItems] = useState([]);
+  const [filteredAllIngredientItems, setFilteredAllIngredientItems] = useState(
+    []
+  );
+  const [selectedIngredientItems, setSelectedIngredientItems] = useState([]);
+  const [filteredSelectedIngredientItems, setFilteredSelectedIngredientItems] =
+    useState([]);
+  const [selectedItemsBoxOne, setSelectedItemsBoxOne] = useState([]);
+  const [selectedItemsBoxTwo, setSelectedItemsBoxTwo] = useState([]);
+  const [selectedOption, setSelectedOption] = useState([]);
+
+  const [selectedItemsBoxThree, setSelectedItemsBoxThree] = useState([]);
+  const [selectedItemsBoxFour, setSelectedItemsBoxFour] = useState([]);
   useEffect(() => {
     async function fetchIngredients() {
       var ingredientResponse = await lambdaCall({
@@ -27,24 +49,204 @@ function UpdateEventIngredientsForm(props) {
       var ingredientCategoryResponse = await lambdaCall({
         service: "get_unique_ingredient_categories",
       });
-      // console.log(ingredientCategoryResponse.data)
-      let uniqueCategories = ingredientCategoryResponse.data.map(item => item.category)
-      console.log(uniqueCategories)
-      setAllIngredientCategoriesCache(uniqueCategories)
-      setAllIngredientCategories(uniqueCategories)
-      setIngredientsObj(ingredientObjResponse.data)
+      let uniqueCategories = ingredientCategoryResponse.data.map(
+        (item) => item.category
+      );
+      setAllIngredientCategoriesCache(uniqueCategories.sort());
+
+      setIngredientsObj(ingredientObjResponse.data);
+      let eventIngredientData = ingredientResponse.data[0]["ingredient"];
+      console.log(eventIngredientData)
+      if (eventIngredientData) {
+        setSelectedIngredientItems(eventIngredientData);
+        uniqueCategories = uniqueCategories.filter((item) =>
+          eventIngredientData.some((i) => i.category !== item)
+        );
+        let selectedCategories = eventIngredientData.map((a) => a.category);
+        selectedCategories = [...new Set(selectedCategories)];
+        setSelectedIngredientCategories(selectedCategories.sort());
+        setSelectedIngredientItems(
+          eventIngredientData.sort((a, b) => a.item.localeCompare(b.item))
+        );
+        setAllIngredientCategories(uniqueCategories.sort());
+      } else {
+        setAllIngredientCategories(uniqueCategories.sort());
+      }
     }
     fetchIngredients();
   }, [props.eventId]);
   useEffect(() => {
-    setFilteredAllIngredientCategories(allIngredientCategories)
-  }, [allIngredientCategories]
-  )
+    setFilteredAllIngredientCategories(allIngredientCategories);
+  }, [allIngredientCategories]);
+  useEffect(() => {
+    setFilteredSelectedIngredientCategories(selectedIngredientCategories);
+  }, [selectedIngredientCategories]);
+  useEffect(() => {
+    setFilteredAllIngredientItems(allIngredientItems);
+  }, [allIngredientItems]);
+  useEffect(() => {
+    setFilteredSelectedIngredientItems(selectedIngredientItems);
+  }, [selectedIngredientItems]);
+
+  const handleRightOne = () => {
+    let selectedCategories = [...selectedIngredientCategories];
+    for (const option of selectedItemsBoxOne) {
+      selectedCategories.push(option);
+    }
+    let categories = allIngredientCategoriesCache;
+    categories = categories.filter((x) => !selectedCategories.includes(x));
+    setAllIngredientCategories(categories.sort());
+    setSelectedIngredientCategories(selectedCategories.sort());
+    setSelectedItemsBoxOne([]);
+    document.getElementById("selected_ingredients_categories").selectedIndex =
+      -1;
+    document.getElementById("ingredient_categories").selectedIndex = -1;
+  };
+  const handleMultiSelectOne = (e) => {
+    document.getElementById("selected_ingredients_categories").selectedIndex =
+      -1;
+    document.getElementById("all_ingredient_items").selectedIndex = -1;
+    document.getElementById("selected_ingredient_items").selectedIndex = -1;
+    let options = e.target.options;
+    let selectedItemsBoxOne = [];
+    for (const option of options) {
+      if (option.selected) {
+        selectedItemsBoxOne.push(option.value);
+      }
+    }
+    setSelectedItemsBoxOne(selectedItemsBoxOne);
+  };
+  const handleLeftOne = () => {
+    setAllIngredientItems([]);
+    let selectedCategories = [...selectedIngredientCategories];
+    let selectedItems = [...selectedIngredientItems];
+    for (const option of selectedItemsBoxTwo) {
+      selectedCategories.splice(selectedCategories.indexOf(option), 1);
+    }
+    let categories = allIngredientCategoriesCache;
+    categories = categories.filter((x) => !selectedCategories.includes(x));
+    categories = categories.filter((x) => !selectedCategories.includes(x));
+    selectedItems = selectedItems.filter((x) =>
+      selectedItemsBoxTwo.some((y) => y !== x.category)
+    );
+    selectedItems.sort((a, b) => a.item.localeCompare(b.item));
+    // setSelectedMenuTableData(formatResult(selectedItems));
+    setSelectedIngredientItems(selectedItems);
+    setAllIngredientCategories(categories.sort());
+    setSelectedIngredientCategories(selectedCategories.sort());
+    setSelectedItemsBoxTwo([]);
+    document.getElementById("selected_ingredients_categories").selectedIndex =
+      -1;
+    document.getElementById("ingredient_categories").selectedIndex = -1;
+  };
+  const handleMultiSelectTwo = (e) => {
+    document.getElementById("ingredient_categories").selectedIndex = -1;
+    document.getElementById("all_ingredient_items").selectedIndex = -1;
+    document.getElementById("selected_ingredient_items").selectedIndex = -1;
+    let options = e.target.options;
+    let selectedOption = e.target.value;
+    let selectedItemsBoxTwo = [];
+    for (const option of options) {
+      if (option.selected) {
+        selectedItemsBoxTwo.push(option.value);
+      }
+    }
+    let allIngredients = [...ingredientsObj];
+    allIngredients = allIngredients.filter(
+      (item) =>
+        item.category === selectedOption &&
+        !selectedIngredientItems.some((i) => i.id === item.id)
+    );
+    setAllIngredientItems(allIngredients);
+    setSelectedItemsBoxTwo(selectedItemsBoxTwo);
+    setSelectedOption(selectedOption);
+  };
+  const handleRightTwo = () => {
+    var selectedItems = [...selectedIngredientItems];
+    for (const option of selectedItemsBoxThree) {
+      selectedItems.push(option);
+    }
+    let allItems = [...ingredientsObj];
+    allItems = allItems.filter(
+      (item) =>
+        item.category === selectedOption &&
+        !selectedItems.some((i) => i.id === item.id)
+    );
+    allItems.sort((a, b) => a.item.localeCompare(b.item));
+    setAllIngredientItems(allItems);
+    setSelectedIngredientItems(
+      selectedItems.sort((a, b) => a.item.localeCompare(b.item))
+    );
+    setSelectedItemsBoxThree([]);
+    document.getElementById("all_ingredient_items").selectedIndex = -1;
+    document.getElementById("selected_ingredient_items").selectedIndex = -1;
+  };
+  const handleMultiSelectThree = (e) => {
+    document.getElementById("ingredient_categories").selectedIndex = -1;
+    document.getElementById("selected_ingredient_items").selectedIndex = -1;
+    document.getElementById("selected_ingredients_categories").selectedIndex =
+      -1;
+    let options = e.target.options;
+    let selectedItemsBoxThree = [];
+    for (const option of options) {
+      if (option.selected) {
+        selectedItemsBoxThree.push(JSON.parse(option.value));
+      }
+    }
+    setSelectedItemsBoxThree(selectedItemsBoxThree);
+  };
+  const handleMultiSelectFour = (e) => {
+    document.getElementById("ingredient_categories").selectedIndex = -1;
+    document.getElementById("selected_ingredients_categories").selectedIndex =
+      -1;
+    document.getElementById("all_ingredient_items").selectedIndex = -1;
+    let options = e.target.options;
+    let selectedItemsBoxFour = [];
+    for (const option of options) {
+      if (option.selected) {
+        selectedItemsBoxFour.push(JSON.parse(option.value));
+      }
+    }
+    setSelectedItemsBoxFour(selectedItemsBoxFour);
+  };
+  const handleLeftTwo = () => {
+    var selectedItems = [...selectedIngredientItems];
+    selectedItems = selectedItems.filter(
+      (item) => !selectedItemsBoxFour.some((i) => i.id === item.id)
+    );
+    let allItems = [...ingredientsObj];
+    allItems = allItems.filter(
+      (item) =>
+        item.category === selectedOption &&
+        !selectedItems.some((i) => i.id === item.id)
+    );
+    allItems.sort((a, b) => a.item.localeCompare(b.item));
+    setAllIngredientItems(allItems);
+    setSelectedIngredientItems(
+      selectedItems.sort((a, b) => a.item.localeCompare(b.item))
+    );
+
+    setSelectedItemsBoxFour([]);
+    document.getElementById("all_ingredient_items").selectedIndex = -1;
+    document.getElementById("selected_ingredient_items").selectedIndex = -1;
+  };
+  const handleSubmit = async () => {
+    await lambdaCall({
+      service: "update_event",
+      newEventData: {
+        "ingredient": selectedIngredientItems,
+      },
+      id: props.eventId,
+    });
+    alert("Updated Ingredients  successfully");
+  };
   return (
     <>
       <Container>
         <Stack gap={2}>
-          <div className="col-md-6 mx-auto"><h1 >View/Update Ingredients</h1></div>
+          <div className="col-md-6 mx-auto">
+            <h1>View/Update Ingredients</h1>
+          </div>
           <Row xs="auto">
             <Col>
               <Form.Control type="text" placeholder="Search" />
@@ -52,7 +254,10 @@ function UpdateEventIngredientsForm(props) {
                 aria-label="Default select example"
                 multiple
                 style={{ height: "300px" }}
-                id="menu_categories"
+                id="ingredient_categories"
+                onChange={(e) => {
+                  handleMultiSelectOne(e);
+                }}
               >
                 {filteredAllIngredientCategories &&
                   filteredAllIngredientCategories.length > 0 &&
@@ -72,6 +277,7 @@ function UpdateEventIngredientsForm(props) {
                   fill="currentColor"
                   className="bi bi-chevron-double-right"
                   viewBox="0 0 16 16"
+                  onClick={() => handleRightOne()}
                 >
                   <path
                     fillRule="evenodd"
@@ -91,6 +297,7 @@ function UpdateEventIngredientsForm(props) {
                   fill="currentColor"
                   className="bi bi-chevron-double-left"
                   viewBox="0 0 16 16"
+                  onClick={() => handleLeftOne()}
                 >
                   <path
                     fillRule="evenodd"
@@ -109,8 +316,20 @@ function UpdateEventIngredientsForm(props) {
                 aria-label="Default select example"
                 multiple
                 style={{ height: "300px" }}
-                id="selected_menu_categories"
+                id="selected_ingredients_categories"
+                onChange={(e) => {
+                  handleMultiSelectTwo(e);
+                }}
               >
+                {filteredSelectedIngredientCategories &&
+                  filteredSelectedIngredientCategories.length > 0 &&
+                  filteredSelectedIngredientCategories.map(
+                    (item, itemIndex) => (
+                      <option key={itemIndex} value={item}>
+                        {item}
+                      </option>
+                    )
+                  )}
               </Form.Select>
             </Col>
             <Col>
@@ -119,8 +338,18 @@ function UpdateEventIngredientsForm(props) {
                 aria-label="Default select example"
                 multiple
                 style={{ height: "300px" }}
-                id="all_menu_items"
+                id="all_ingredient_items"
+                onChange={(e) => {
+                  handleMultiSelectThree(e);
+                }}
               >
+                {filteredAllIngredientItems &&
+                  filteredAllIngredientItems.length > 0 &&
+                  filteredAllIngredientItems.map((item, itemIndex) => (
+                    <option key={itemIndex} value={JSON.stringify(item)}>
+                      {item.item}
+                    </option>
+                  ))}
               </Form.Select>
             </Col>
             <Col>
@@ -132,6 +361,7 @@ function UpdateEventIngredientsForm(props) {
                   fill="currentColor"
                   className="bi bi-chevron-double-right"
                   viewBox="0 0 16 16"
+                  onClick={() => handleRightTwo()}
                 >
                   <path
                     fillRule="evenodd"
@@ -151,6 +381,7 @@ function UpdateEventIngredientsForm(props) {
                   fill="currentColor"
                   className="bi bi-chevron-double-left"
                   viewBox="0 0 16 16"
+                  onClick={() => handleLeftTwo()}
                 >
                   <path
                     fillRule="evenodd"
@@ -169,16 +400,47 @@ function UpdateEventIngredientsForm(props) {
                 aria-label="Default select example"
                 multiple
                 style={{ height: "300px" }}
-                id="selected_menu_items"
+                id="selected_ingredient_items"
+                onChange={(e) => {
+                  handleMultiSelectFour(e);
+                }}
               >
+                {filteredSelectedIngredientItems &&
+                  filteredSelectedIngredientItems.length > 0 &&
+                  filteredSelectedIngredientItems.map((item, itemIndex) => (
+                    <option key={itemIndex} value={JSON.stringify(item)}>
+                      {item.item}
+                    </option>
+                  ))}
               </Form.Select>
             </Col>
           </Row>
+          {selectedIngredientItems && (
+            <Table striped bordered hover>
+              <thead>
+                <tr>
+                  <th>Serial No</th>
+                  <th>Category</th>
+                  <th>Item</th>
+                </tr>
+              </thead>
+              <tbody>
+                {selectedIngredientItems.map((record, recordIndex) => (
+                  <tr key={recordIndex}>
+                    <td>{recordIndex + 1}</td>
+                    <td>{record.category}</td>
+                    <td>{record.item}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          )}
           <Button
             className="col-md-2 mx-auto"
             as="input"
             type="submit"
             value="submit"
+            onClick={handleSubmit}
           />{" "}
         </Stack>
       </Container>
