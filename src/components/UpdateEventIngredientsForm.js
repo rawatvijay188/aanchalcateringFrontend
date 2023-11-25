@@ -9,7 +9,37 @@ import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
 
 function UpdateEventIngredientsForm(props) {
-  const [ingredientsObj,setIngredientsObj]=useState([]);
+  const [ingredientsObj, setIngredientsObj] = useState([]);
+  const [allIngredientCategoriesCache, setAllIngredientCategoriesCache] = useState([])
+  const [allIngredientCategories, setAllIngredientCategories] = useState([])
+  const [filteredAllIngredientCategories, setFilteredAllIngredientCategories] = useState([])
+
+  useEffect(() => {
+    async function fetchIngredients() {
+      var ingredientResponse = await lambdaCall({
+        service: "selectEventColumn",
+        columns: ["ingredient"],
+        id: props.eventId,
+      });
+      var ingredientObjResponse = await lambdaCall({
+        service: "selectAllIngeridient",
+      });
+      var ingredientCategoryResponse = await lambdaCall({
+        service: "get_unique_ingredient_categories",
+      });
+      // console.log(ingredientCategoryResponse.data)
+      let uniqueCategories = ingredientCategoryResponse.data.map(item => item.category)
+      console.log(uniqueCategories)
+      setAllIngredientCategoriesCache(uniqueCategories)
+      setAllIngredientCategories(uniqueCategories)
+      setIngredientsObj(ingredientObjResponse.data)
+    }
+    fetchIngredients();
+  }, [props.eventId]);
+  useEffect(() => {
+    setFilteredAllIngredientCategories(allIngredientCategories)
+  }, [allIngredientCategories]
+  )
   return (
     <>
       <Container>
@@ -23,8 +53,14 @@ function UpdateEventIngredientsForm(props) {
                 multiple
                 style={{ height: "300px" }}
                 id="menu_categories"
-
               >
+                {filteredAllIngredientCategories &&
+                  filteredAllIngredientCategories.length > 0 &&
+                  filteredAllIngredientCategories.map((item, itemIndex) => (
+                    <option key={itemIndex} value={item}>
+                      {item}
+                    </option>
+                  ))}
               </Form.Select>
             </Col>
             <Col>
