@@ -23,11 +23,19 @@ const MultiSelectWithSearch = ({
     if (options && options.length > 0) {
       setAllOptions(options.slice().sort());
       setFilteredOptions(options.slice().sort());
+    } else {
+      setAllOptions([]);
+      setFilteredOptions([]);
+      setSeltectedOptions([]);
+      setFilteredSelectedOptions([]);
+      setSelectedItemsBoxOne([]);
+      setSelectedItemsBoxTwo([]);
     }
   }, [options]);
   useEffect(() => {
     setFilteredSelectedOptions(selectedOptions);
   }, [selectedOptions]);
+
   const handleRight = () => {
     let selectedItems = [...selectedOptions];
     for (const option of selectedItemsBoxOne) {
@@ -36,12 +44,14 @@ const MultiSelectWithSearch = ({
     let allItems = allOptions;
     allItems = allItems.filter((x) => !selectedItems.includes(x));
     setAllOptions(allItems.sort());
+    setFilteredOptions(allItems.sort());
     setSeltectedOptions(selectedItems.sort());
     onSelectionChange(id, selectedItems);
     setSelectedItemsBoxOne([]);
     document.getElementById(multiSelectLeftID).selectedIndex = -1;
     document.getElementById(multiSelectRightID).selectedIndex = -1;
   };
+
   const handleLeft = () => {
     let selectedItems = [...selectedOptions];
     let allItems = allOptions;
@@ -50,12 +60,14 @@ const MultiSelectWithSearch = ({
       allItems.push(option);
     }
     setAllOptions(allItems.sort());
+    setFilteredOptions(allItems.sort());
     setSeltectedOptions(selectedItems.sort());
     onSelectionChange(id, selectedItems);
     setSelectedItemsBoxTwo([]);
     document.getElementById(multiSelectLeftID).selectedIndex = -1;
     document.getElementById(multiSelectRightID).selectedIndex = -1;
   };
+
   const handleMultiSelectOne = (e) => {
     document.getElementById(multiSelectRightID).selectedIndex = -1;
     let options = e.target.options;
@@ -67,6 +79,7 @@ const MultiSelectWithSearch = ({
     }
     setSelectedItemsBoxOne(selectedItemsBoxOne);
   };
+
   const handleMultiSelectTwo = (e) => {
     document.getElementById(multiSelectLeftID).selectedIndex = -1;
 
@@ -79,6 +92,7 @@ const MultiSelectWithSearch = ({
     }
     setSelectedItemsBoxTwo(selectedItemsBoxTwo);
   };
+
   const filterOptions = (e) => {
     var value = e.target.value.toLowerCase();
     var allItems = allOptions;
@@ -90,6 +104,7 @@ const MultiSelectWithSearch = ({
       setFilteredOptions(filteredItems.sort());
     }
   };
+
   const filterSelectedOptions = (e) => {
     var value = e.target.value.toLowerCase();
     var allItems = selectedOptions;

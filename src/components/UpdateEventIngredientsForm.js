@@ -63,7 +63,6 @@ function UpdateEventIngredientsForm(props) {
         let selectedCategories = eventIngredientData.map((a) => a.category);
         selectedCategories = [...new Set(selectedCategories)];
         setSelectedIngredientCategories(selectedCategories.sort());
-        console.log(eventIngredientData);
         setSelectedIngredientItems(
           eventIngredientData.sort((a, b) => a.item.localeCompare(b.item))
         );
@@ -272,7 +271,6 @@ function UpdateEventIngredientsForm(props) {
     );
     allItems.sort((a, b) => a.item.localeCompare(b.item));
     setAllIngredientItems(allItems);
-    console.log(selectedItems);
     setSelectedIngredientItems(
       selectedItems.sort((a, b) => a.item.localeCompare(b.item))
     );
@@ -282,9 +280,7 @@ function UpdateEventIngredientsForm(props) {
     document.getElementById("selected_ingredient_items").selectedIndex = -1;
   };
   const handleSubmit = async () => {
-    console.log(selectedIngredientItems);
     for (const record of selectedIngredientItems) {
-      console.log(record);
       if (record.rate_per_unit === "" || record.quantity === "") {
         alert("Please ensure all items are filled before submitting.");
         return false;
@@ -300,7 +296,6 @@ function UpdateEventIngredientsForm(props) {
     alert("Updated Ingredients  successfully");
   };
   const handleChange = (e, index, field) => {
-    console.log(e.target.value);
     const updatedIngredientItems = {
       ...selectedIngredientItems[index],
       [field]: e.target.value,

@@ -3,7 +3,7 @@ import Event from "./Event";
 import NavigationBar from "./NavigationBar";
 import MenuTable from "./menuTable";
 import IngredientTable from "./ingredientsTable";
-import EventDetails from "./Report";
+import Report from "./Report";
 import AddEventForm from "./AddEventForm";
 import UpdateEventForm from "./UpdateEventForm";
 import UpdateEventMenuForm from "./UpdateEventMenuForm";
@@ -22,14 +22,14 @@ function Home() {
   //   height: '100vh', // Adjust as needed
   // };
   const containerStyle = {
-    backgroundColor: 'white', // Replace with your desired color code
-    height: '100vh', // Adjust as needed
-    marginTop:"50px"
+    backgroundColor: "white", // Replace with your desired color code
+    height: "100vh", // Adjust as needed
+    marginTop: "50px",
   };
   return (
     <>
       <NavigationBar setTabValue={setTabValue} />
-      <div  style={containerStyle} >
+      <div style={containerStyle}>
         {tabValue === 0 && <MenuAndIngredients setTabValue={setTabValue} />}
         {tabValue === 1 && <Event setTabValue={setTabValue} />}
         {tabValue === 2 && <MenuTable />}
@@ -39,7 +39,7 @@ function Home() {
           <UpdateEventForm setTabValue={setTabValue} setEventId={setEventId} />
         )}
         {tabValue === 6 && <UpdateEventMenuForm eventId={eventId} />}
-        {tabValue === 7 && <EventDetails />}
+        {tabValue === 7 && <Report />}
         {tabValue === 8 && <UpdateEventIngredientsForm eventId={eventId} />}
       </div>
     </>

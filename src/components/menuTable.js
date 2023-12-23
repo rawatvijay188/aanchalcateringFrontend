@@ -93,7 +93,7 @@ const MenuTable = () => {
     let updatedData = { ...menuData[categoryIndex] };
     let checkFlag = false;
     if (oldItem === updatedData["item"]) {
-      console.log("no changes have been done.");
+      alert("no changes have been done.");
       setEditableRow(null);
       return;
     }

@@ -47,7 +47,7 @@ const IngredientTable = () => {
     let updatedData = { ...ingredient };
     let checkFlag = false;
     if (JSON.stringify(oldData) === JSON.stringify(updatedData)) {
-      console.log("no changes have been done.");
+      alert("no changes have been done.");
       setEditableRow(null);
       return;
     }

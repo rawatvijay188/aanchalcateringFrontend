@@ -58,9 +58,8 @@ const AddEventForm = () => {
           formData["note"],
         ],
       };
-      console.log(body);
       await lambdaCall(body);
-      console.log("Added Event Details");
+      alert("Added Event Details");
     }
     setValidated(true);
   };
