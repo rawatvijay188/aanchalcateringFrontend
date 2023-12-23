@@ -53,10 +53,8 @@ function UpdateEventIngredientsForm(props) {
         (item) => item.category
       );
       setAllIngredientCategoriesCache(uniqueCategories.sort());
-
       setIngredientsObj(ingredientObjResponse.data);
       let eventIngredientData = ingredientResponse.data[0]["ingredient"];
-      console.log(eventIngredientData)
       if (eventIngredientData) {
         setSelectedIngredientItems(eventIngredientData);
         uniqueCategories = uniqueCategories.filter((item) =>
@@ -65,6 +63,7 @@ function UpdateEventIngredientsForm(props) {
         let selectedCategories = eventIngredientData.map((a) => a.category);
         selectedCategories = [...new Set(selectedCategories)];
         setSelectedIngredientCategories(selectedCategories.sort());
+        console.log(eventIngredientData);
         setSelectedIngredientItems(
           eventIngredientData.sort((a, b) => a.item.localeCompare(b.item))
         );
@@ -88,6 +87,56 @@ function UpdateEventIngredientsForm(props) {
     setFilteredSelectedIngredientItems(selectedIngredientItems);
   }, [selectedIngredientItems]);
 
+  const allIngredientCategoriesFilter = (e) => {
+    var value = e.target.value.toLowerCase();
+    var allItems = allIngredientCategories;
+    var filteredItems = [];
+
+    if (value === "") {
+      setFilteredAllIngredientCategories(allIngredientCategories);
+    } else {
+      filteredItems = allItems.filter((x) => x.toLowerCase().includes(value));
+      setFilteredAllIngredientCategories(filteredItems);
+    }
+  };
+
+  const selectedIngredientCategoriesFilter = (e) => {
+    var value = e.target.value.toLowerCase();
+    var allItems = selectedIngredientCategories;
+    var filteredItems = [];
+    if (value === "") {
+      setFilteredSelectedIngredientCategories(selectedIngredientCategories);
+    } else {
+      filteredItems = allItems.filter((x) => x.toLowerCase().includes(value));
+      setFilteredSelectedIngredientCategories(filteredItems);
+    }
+  };
+  const allIngredientItemsFilter = (e) => {
+    var value = e.target.value.toLowerCase();
+    var allItems = allIngredientItems;
+    var filteredItems = [];
+    if (value === "") {
+      setFilteredAllIngredientItems(allIngredientItems);
+    } else {
+      filteredItems = allItems.filter((x) =>
+        x.item.toLowerCase().includes(value)
+      );
+      setFilteredAllIngredientItems(filteredItems);
+    }
+  };
+  const selectedIngredientItemsFilter = (e) => {
+    var value = e.target.value.toLowerCase();
+    var allItems = selectedIngredientItems;
+    var filteredItems = [];
+    if (value === "") {
+      setFilteredSelectedIngredientItems(selectedIngredientItems);
+    } else {
+      filteredItems = allItems.filter((x) =>
+        x.item.toLowerCase().includes(value)
+      );
+      setFilteredSelectedIngredientItems(filteredItems);
+    }
+  };
   const handleRightOne = () => {
     let selectedCategories = [...selectedIngredientCategories];
     for (const option of selectedItemsBoxOne) {
@@ -164,6 +213,7 @@ function UpdateEventIngredientsForm(props) {
   const handleRightTwo = () => {
     var selectedItems = [...selectedIngredientItems];
     for (const option of selectedItemsBoxThree) {
+      option["quantity"] = "";
       selectedItems.push(option);
     }
     let allItems = [...ingredientsObj];
@@ -222,6 +272,7 @@ function UpdateEventIngredientsForm(props) {
     );
     allItems.sort((a, b) => a.item.localeCompare(b.item));
     setAllIngredientItems(allItems);
+    console.log(selectedItems);
     setSelectedIngredientItems(
       selectedItems.sort((a, b) => a.item.localeCompare(b.item))
     );
@@ -231,14 +282,34 @@ function UpdateEventIngredientsForm(props) {
     document.getElementById("selected_ingredient_items").selectedIndex = -1;
   };
   const handleSubmit = async () => {
+    console.log(selectedIngredientItems);
+    for (const record of selectedIngredientItems) {
+      console.log(record);
+      if (record.rate_per_unit === "" || record.quantity === "") {
+        alert("Please ensure all items are filled before submitting.");
+        return false;
+      }
+    }
     await lambdaCall({
       service: "update_event",
       newEventData: {
-        "ingredient": selectedIngredientItems,
+        ingredient: selectedIngredientItems,
       },
       id: props.eventId,
     });
     alert("Updated Ingredients  successfully");
+  };
+  const handleChange = (e, index, field) => {
+    console.log(e.target.value);
+    const updatedIngredientItems = {
+      ...selectedIngredientItems[index],
+      [field]: e.target.value,
+    };
+    setSelectedIngredientItems([
+      ...selectedIngredientItems.slice(0, index),
+      updatedIngredientItems,
+      ...selectedIngredientItems.slice(index + 1),
+    ]);
   };
   return (
     <>
@@ -249,7 +320,11 @@ function UpdateEventIngredientsForm(props) {
           </div>
           <Row xs="auto">
             <Col>
-              <Form.Control type="text" placeholder="Search" />
+              <Form.Control
+                type="text"
+                placeholder="Search"
+                onKeyUp={(e) => allIngredientCategoriesFilter(e)}
+              />
               <Form.Select
                 aria-label="Default select example"
                 multiple
@@ -311,7 +386,11 @@ function UpdateEventIngredientsForm(props) {
               </Row>
             </Col>
             <Col>
-              <Form.Control type="text" placeholder="Search" />
+              <Form.Control
+                type="text"
+                placeholder="Search"
+                onKeyUp={(e) => selectedIngredientCategoriesFilter(e)}
+              />
               <Form.Select
                 aria-label="Default select example"
                 multiple
@@ -333,7 +412,11 @@ function UpdateEventIngredientsForm(props) {
               </Form.Select>
             </Col>
             <Col>
-              <Form.Control type="text" placeholder="Search" />
+              <Form.Control
+                type="text"
+                placeholder="Search"
+                onKeyUp={(e) => allIngredientItemsFilter(e)}
+              />
               <Form.Select
                 aria-label="Default select example"
                 multiple
@@ -395,7 +478,11 @@ function UpdateEventIngredientsForm(props) {
               </Row>
             </Col>
             <Col>
-              <Form.Control type="text" placeholder="Search" />
+              <Form.Control
+                type="text"
+                placeholder="Search"
+                onKeyUp={(e) => selectedIngredientItemsFilter(e)}
+              />
               <Form.Select
                 aria-label="Default select example"
                 multiple
@@ -422,6 +509,9 @@ function UpdateEventIngredientsForm(props) {
                   <th>Serial No</th>
                   <th>Category</th>
                   <th>Item</th>
+                  <th>Unit</th>
+                  <th>Rate Per Unit</th>
+                  <th>Quantity</th>
                 </tr>
               </thead>
               <tbody>
@@ -430,6 +520,25 @@ function UpdateEventIngredientsForm(props) {
                     <td>{recordIndex + 1}</td>
                     <td>{record.category}</td>
                     <td>{record.item}</td>
+                    <td>{record.unit}</td>
+                    <td>
+                      <input
+                        type="text"
+                        value={record.rate_per_unit}
+                        onChange={(e) =>
+                          handleChange(e, recordIndex, "rate_per_unit")
+                        }
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="text"
+                        value={record.quantity}
+                        onChange={(e) =>
+                          handleChange(e, recordIndex, "quantity")
+                        }
+                      />
+                    </td>
                   </tr>
                 ))}
               </tbody>
