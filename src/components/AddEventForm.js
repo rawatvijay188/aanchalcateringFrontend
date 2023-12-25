@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useRef } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
@@ -8,11 +8,10 @@ import { Container } from "react-bootstrap";
 
 const AddEventForm = () => {
   const [validated, setValidated] = useState(false);
-
-  const [formData, setFormData] = useState({
+  const initialFormData = {
     eventTitle: "",
     organizerName: "",
-    eventType: "",
+    eventType: "breakfast",
     address: "",
     venue: "",
     bookingDate: "",
@@ -25,11 +24,27 @@ const AddEventForm = () => {
     balance: "",
     pricePerPlate: "",
     note: "",
-  });
+  };
 
+  const [formData, setFormData] = useState(initialFormData);
+  const formRef = useRef();
   const handleChange = (e) => {
     const { id, value } = e.target;
     setFormData({ ...formData, [id]: value });
+  };
+  const resetForm = () => {
+    setFormData(initialFormData);
+    setValidated(false);
+    const formInputs = document.querySelectorAll("input, select, textarea");
+    formInputs.forEach((input) => {
+      input.value = "";
+      input.setCustomValidity("");
+    });
+
+    // Reset the form using the form reference
+    if (formRef.current) {
+      formRef.current.reset();
+    }
   };
 
   const handleDateChange = (e) => {
@@ -39,6 +54,7 @@ const AddEventForm = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     const form = event.currentTarget;
+    setValidated(true);
     if (form.checkValidity()) {
       var body = {
         service: "add_event",
@@ -61,12 +77,19 @@ const AddEventForm = () => {
       };
       await lambdaCall(body);
       alert("Added Event Details");
+      resetForm();
     }
-    setValidated(true);
+    
   };
   return (
     <Container>
-      <Form noValidate validated={validated} onSubmit={handleSubmit}>
+      <Form
+        noValidate
+        validated={validated}
+        onSubmit={handleSubmit}
+        ref={formRef}
+        id="eventForm"
+      >
         <Row className="mb-3">
           <Form.Group as={Col} controlId="eventTitle">
             <Form.Label>Event Title</Form.Label>

@@ -130,6 +130,7 @@ const Billing = (props) => {
     body["service"] = "add_bill";
     await lambdaCall(body);
     alert("Added Bill successfully");
+    clearForm();
   };
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
@@ -138,6 +139,16 @@ const Billing = (props) => {
       item.customer_name.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredBillHistory(filteredData);
+  };
+  const clearForm = (e) => {
+    setInvoiceData({
+      date: "",
+      customerName: "",
+      gstNo: "",
+      items: [{ sno: 1, description: "", quantity: 0, rate: 0, amount: 0 }],
+    });
+    setAdvance(0);
+    setBalance(0);
   };
 
   return (
