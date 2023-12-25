@@ -36,3 +36,7 @@
     transform: rotate(360deg);
   }
 }
+.form-label {
+  font-weight: bold;
+  color: #333; /* Set the color as per your design */
+}

@@ -1,19 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Form from "react-bootstrap/Form";
 import lambdaCall from "../helper/LambdaCall";
 import Button from "react-bootstrap/Button";
 import Stack from "react-bootstrap/Stack";
 import { Container, Row, Col } from "react-bootstrap";
 import MultiSelectWithSearch from "./MultiSelectWithSearch";
+import ReportTable from "./ReportTable";
 
 function Report() {
   const [formData, setFormData] = useState(null);
-  // const [eventData, setEventData] = useState([]);
   const [eventTitles, setEventTitles] = useState([]);
   const [ingredientCategories, setIngredientCategories] = useState([]);
+  const [reportData, setReportData] = useState([]);
+
   const getEventData = async (data) => {
     let resultData = data;
-    // setEventData(resultData);
     let titles = Array.from(
       new Set(resultData.map((event) => event.event_title))
     );
@@ -30,16 +31,7 @@ function Report() {
     setEventTitles(titles);
     setIngredientCategories(Array.from(items));
   };
-  useEffect(() => {
-    async function setData() {
-      var response = await lambdaCall({
-        service: "eventFilter",
-      });
-      let resultData = response.data;
-      getEventData(resultData);
-    }
-    setData();
-  }, []);
+
   const handleFormChange = (id, value) => {
     if (value) {
       setFormData({ ...formData, [id]: value });
@@ -53,9 +45,10 @@ function Report() {
   const handleDateChange = async (fromDate, toDate) => {
     if (fromDate && toDate) {
       var response = await lambdaCall({
-        service: "eventFilterByDate",
+        service: "eventFilter",
         from_date: fromDate,
         to_date: toDate,
+        date_type: "date_of_function",
       });
       getEventData(response.data);
     }
@@ -72,8 +65,33 @@ function Report() {
     document.getElementById("from_date").value = "";
     document.getElementById("to_date").value = "";
   };
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
+    if (!formData.from_date) {
+      alert("Please enter a valid start date");
+      return;
+    }
+    if (!formData.to_date) {
+      alert("Please enter a valid end date");
+      return;
+    }
+    if (!("event_title" in formData) || formData.event_title?.length === 0) {
+      alert("Please enter a valid event name");
+      return;
+    }
+
+    if (
+      !("ingredient_categories" in formData) ||
+      formData.ingredient_categories?.length === 0
+    ) {
+      alert("Please enter valid ingredients");
+      return;
+    }
+    var body = { ...formData };
+    body["service"] = "report_filter";
+    var response = await lambdaCall(body);
+    let resultData = response.data;
+    setReportData(resultData);
   };
   return (
     <div>
@@ -140,13 +158,16 @@ function Report() {
 
           <Stack gap={2} direction="horizontal" className="col-md-2 mx-auto">
             <Button variant="primary" type="submit">
-              Submit
+              Fetch
             </Button>
             <Button variant="primary" onClick={() => clearForm()}>
               Clear
             </Button>
           </Stack>
         </Form>
+        {reportData && reportData.length > 0 && (
+          <ReportTable data={reportData} />
+        )}
       </Container>
     </div>
   );

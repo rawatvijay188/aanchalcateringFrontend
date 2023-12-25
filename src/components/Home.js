@@ -9,11 +9,15 @@ import UpdateEventForm from "./UpdateEventForm";
 import UpdateEventMenuForm from "./UpdateEventMenuForm";
 import MenuAndIngredients from "./MenuAndIngredients";
 import UpdateEventIngredientsForm from "./UpdateEventIngredientsForm";
+import Billing from "./Billing";
+import ViewBill from "./DisplayBill";
+
 // import bg_image from "../static/images/bg_image.jpg";
 
 function Home() {
   const [tabValue, setTabValue] = useState(0);
   const [eventId, setEventId] = useState(null);
+  const [billId,setBillId]=useState(null)
 
   // const containerStyle = {
   //   backgroundImage: `url("${bg_image}")`, // Replace with the path to your image
@@ -41,6 +45,8 @@ function Home() {
         {tabValue === 6 && <UpdateEventMenuForm eventId={eventId} />}
         {tabValue === 7 && <Report />}
         {tabValue === 8 && <UpdateEventIngredientsForm eventId={eventId} />}
+        {tabValue === 9 && <Billing setTabValue={setTabValue} setBillId={setBillId}/>}
+        {tabValue === 10 && <ViewBill billId={billId}/>}
       </div>
     </>
   );

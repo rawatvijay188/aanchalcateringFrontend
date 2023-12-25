@@ -138,8 +138,8 @@ const MultiSelectWithSearch = ({
                   handleMultiSelectOne(e);
                 }}
               >
-                {filteredOptions.map((option) => (
-                  <option key={option} value={option}>
+                {filteredOptions.map((option,index) => (
+                  <option key={index} value={option}>
                     {option}
                   </option>
                 ))}
@@ -208,8 +208,8 @@ const MultiSelectWithSearch = ({
                   handleMultiSelectTwo(e);
                 }}
               >
-                {filteredSelectedOptions.map((option) => (
-                  <option key={option} value={option}>
+                {filteredSelectedOptions.map((option,index) => (
+                  <option key={index} value={option}>
                     {option}
                   </option>
                 ))}

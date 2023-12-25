@@ -1,6 +1,6 @@
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
-import logo from "../static/images/logo-anchal.png"
+import logo from "../static/images/logo-anchal.png";
 
 function NavigationBar(props) {
   return (
@@ -26,17 +26,31 @@ function NavigationBar(props) {
             >
               Menu
             </Nav.Link>
-            <Nav.Link onClick={(e) => {
-              e.preventDefault();
-              props.setTabValue(1);
-            }}>Event</Nav.Link>
-            <Nav.Link onClick={(e) => {
-              e.preventDefault();
-              props.setTabValue(7);
-            }}>Report</Nav.Link>
+            <Nav.Link
+              onClick={(e) => {
+                e.preventDefault();
+                props.setTabValue(1);
+              }}
+            >
+              Event
+            </Nav.Link>
+            <Nav.Link
+              onClick={(e) => {
+                e.preventDefault();
+                props.setTabValue(7);
+              }}
+            >
+              Report
+            </Nav.Link>
+            <Nav.Link
+              onClick={(e) => {
+                e.preventDefault();
+                props.setTabValue(9);
+              }}
+            >
+              Billing
+            </Nav.Link>
           </Nav>
-
-
         </Navbar.Collapse>
       </Navbar>
     </>
