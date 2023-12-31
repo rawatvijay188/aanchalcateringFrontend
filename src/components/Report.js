@@ -1,17 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Form from "react-bootstrap/Form";
 import lambdaCall from "../helper/LambdaCall";
 import Button from "react-bootstrap/Button";
 import Stack from "react-bootstrap/Stack";
 import { Container, Row, Col } from "react-bootstrap";
 import MultiSelectWithSearch from "./MultiSelectWithSearch";
-import ReportTable from "./ReportTable";
+import CombinedReportTable from "./CombinedReportTable";
+import SegregatedReportTable from "./SegregatedReportTable";
 
 function Report() {
   const [formData, setFormData] = useState(null);
   const [eventTitles, setEventTitles] = useState([]);
   const [ingredientCategories, setIngredientCategories] = useState([]);
   const [reportData, setReportData] = useState([]);
+  const [reportType, setReportType] = useState("combined");
 
   const getEventData = async (data) => {
     let resultData = data;
@@ -62,9 +64,14 @@ function Report() {
     });
     let resultData = response.data;
     getEventData(resultData);
+    setReportData([]);
     document.getElementById("from_date").value = "";
     document.getElementById("to_date").value = "";
   };
+  useEffect(() => {
+    console.log("clearing report data");
+    setReportData([]);
+  }, [reportType]);
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (!formData.from_date) {
@@ -79,20 +86,31 @@ function Report() {
       alert("Please enter a valid event name");
       return;
     }
-
-    if (
-      !("ingredient_categories" in formData) ||
-      formData.ingredient_categories?.length === 0
-    ) {
-      alert("Please enter valid ingredients");
-      return;
+    var body = {};
+    if (reportType === "combined") {
+      if (
+        !("ingredient_categories" in formData) ||
+        formData.ingredient_categories?.length === 0
+      ) {
+        alert("Please enter valid ingredients");
+        return;
+      }
+      body = { ...formData };
+      body["service"] = "combined_report_filter";
+    } else {
+      body = {
+        from_date: formData.from_date,
+        to_date: formData.to_date,
+        event_title: formData.event_title,
+        service: "segregated_report_filter",
+      };
     }
-    var body = { ...formData };
-    body["service"] = "report_filter";
     var response = await lambdaCall(body);
     let resultData = response.data;
+    console.log(resultData);
     setReportData(resultData);
   };
+
   return (
     <div>
       <Container>
@@ -143,20 +161,34 @@ function Report() {
                 handleFormChange(id, selectedValues);
               }}
             />
+            <Form.Group controlId="report_type">
+              <Form.Label>Report Type</Form.Label>
+              <Form.Select
+                aria-label="Default select example"
+                onChange={(e) => {
+                  setReportType(e.target.value);
+                  setReportData([]);
+                }}
+              >
+                <option value="combined">Combined Report</option>
+                <option value="segregated">Segregated Report</option>
+              </Form.Select>
+            </Form.Group>
           </Row>
-          <Row className="mb-3">
-            <MultiSelectWithSearch
-              options={ingredientCategories || []}
-              leftLabel={"Ingredient Categories"}
-              id="ingredient_categories"
-              rightLabel={"Selected Ingredient Categories"}
-              onSelectionChange={(id, selectedValues) => {
-                handleFormChange(id, selectedValues);
-              }}
-            />
-          </Row>
-
-          <Stack gap={2} direction="horizontal" className="col-md-2 mx-auto">
+          {reportType === "combined" && (
+            <Row className="mb-3">
+              <MultiSelectWithSearch
+                options={ingredientCategories || []}
+                leftLabel={"Ingredient Categories"}
+                id="ingredient_categories"
+                rightLabel={"Selected Ingredient Categories"}
+                onSelectionChange={(id, selectedValues) => {
+                  handleFormChange(id, selectedValues);
+                }}
+              />
+            </Row>
+          )}
+          <Stack gap={2} direction="horizontal" className="col-md-4 mx-auto">
             <Button variant="primary" type="submit">
               Fetch
             </Button>
@@ -165,8 +197,11 @@ function Report() {
             </Button>
           </Stack>
         </Form>
-        {reportData && reportData.length > 0 && (
-          <ReportTable data={reportData} />
+        {reportData && reportData.length > 0 && reportType === "combined" && (
+          <CombinedReportTable data={reportData} />
+        )}
+        {reportData && reportData.length > 0 && reportType === "segregated" && (
+          <SegregatedReportTable data={reportData} />
         )}
       </Container>
     </div>

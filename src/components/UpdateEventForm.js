@@ -18,7 +18,7 @@ const UpdateEventForm = (props) => {
   });
   const [eventDetails, setEventDetails] = useState([]);
   const [filteredEventDetails, setFilteredEventDetails] = useState([]);
-  const [editableRow, setEditableRow] = useState(null);
+  const [editableId, setEditableId] = useState(null);
   const [oldData, setOldData] = useState({});
   const [changeCheck, setChangeCheck] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
@@ -78,10 +78,10 @@ const UpdateEventForm = (props) => {
       setFormData(formDataCopy);
     }
   };
-  const toggleEdit = (index) => {
+  const toggleEdit = (eventId) => {
     setChangeCheck(false);
-    setEditableRow(index);
-    var updatedData = { ...eventDetails[index] };
+    setEditableId(eventId);
+    var updatedData = { ...eventDetails.find((item) => item.id === eventId) };
     setOldData(updatedData);
   };
   async function fetchEventDetails() {
@@ -103,10 +103,10 @@ const UpdateEventForm = (props) => {
     }
     fetchEventDetails();
   };
-  const handleSave = async (index) => {
-    setEditableRow(null);
+  const handleSave = async (eventId) => {
+    setEditableId(null);
     if (changeCheck) {
-      var updatedData = { ...eventDetails[index] };
+      var updatedData = { ...eventDetails.find((item) => item.id === eventId) };
       var id = updatedData["id"];
       delete updatedData["id"];
       var body = {
@@ -118,25 +118,27 @@ const UpdateEventForm = (props) => {
     }
     refresh();
   };
-  const handleDelete = async (index) => {
-    var id = eventDetails[index]["id"];
-    var body = { service: "delete_event", id: id };
+  const handleDelete = async (eventId) => {
+    var body = { service: "delete_event", id: eventId };
     await lambdaCall(body);
     refresh();
   };
-  const cancelEdit = (index) => {
-    setEditableRow(null);
+  const cancelEdit = (eventId) => {
+    setEditableId(null);
     var updatedData = [...eventDetails];
+    const index = updatedData.findIndex(item => item.id === eventId);
     updatedData[index] = oldData;
     setEventDetails(updatedData);
     setChangeCheck(false);
   };
-  const handleTableChange = (e, index, field) => {
+  const handleTableChange = (e, eventId, field) => {
     const updatedData = [...eventDetails];
+    const index = updatedData.findIndex(item => item.id === eventId);
     if (field === "select") {
       // Handle checkbox changes
       const isChecked = e.target.checked;
       if (isChecked) {
+        
         var id = updatedData[index]["id"];
         setSelectedId(id);
         console.log("Selected ID:", id);
@@ -156,7 +158,7 @@ const UpdateEventForm = (props) => {
     });
     setEventDetails([]);
     setFilteredEventDetails([]);
-    setEditableRow(null);
+    setEditableId(null);
     setOldData({});
     setChangeCheck(false);
     document.getElementById("event_title").value = "";
@@ -172,7 +174,7 @@ const UpdateEventForm = (props) => {
   const refresh = () => {
     setEventDetails([]);
     setFilteredEventDetails([]);
-    setEditableRow(null);
+    setEditableId(null);
     setOldData({});
     setChangeCheck(false);
     fetchEventDetails();
@@ -489,19 +491,19 @@ const UpdateEventForm = (props) => {
                       type={"checkbox"}
                       id={item.id}
                       onChange={(e) =>
-                        handleTableChange(e, itemIndex, "select")
+                        handleTableChange(e, item.id, "select")
                       }
                       checked={item.id === selectedId}
                     />
                   </td>
                   <td>{item.id}</td>
                   <td>
-                    {editableRow === itemIndex ? (
+                    {editableId === item.id ? (
                       <input
                         type="text"
                         value={item.event_title}
                         onChange={(e) =>
-                          handleTableChange(e, itemIndex, "event_title")
+                          handleTableChange(e, item.id, "event_title")
                         }
                       />
                     ) : (
@@ -509,12 +511,12 @@ const UpdateEventForm = (props) => {
                     )}
                   </td>
                   <td>
-                    {editableRow === itemIndex ? (
+                    {editableId === item.id ? (
                       <select
                         type="text"
                         value={item.event_type}
                         onChange={(e) =>
-                          handleTableChange(e, itemIndex, "event_type")
+                          handleTableChange(e, item.id, "event_type")
                         }
                       >
                         <option value="breakfast">Breakfast</option>
@@ -527,14 +529,14 @@ const UpdateEventForm = (props) => {
                     )}
                   </td>
                   <td>
-                    {editableRow === itemIndex ? (
+                    {editableId === item.id ? (
                       <input
                         type="date"
                         value={moment(new Date(item.date_of_function)).format(
                           "YYYY-MM-DD"
                         )}
                         onChange={(e) =>
-                          handleTableChange(e, itemIndex, "date_of_function")
+                          handleTableChange(e, item.id, "date_of_function")
                         }
                       />
                     ) : (
@@ -544,12 +546,12 @@ const UpdateEventForm = (props) => {
                     )}
                   </td>
                   <td>
-                    {editableRow === itemIndex ? (
+                    {editableId === item.id ? (
                       <input
                         type="text"
                         value={item.venue}
                         onChange={(e) =>
-                          handleTableChange(e, itemIndex, "venue")
+                          handleTableChange(e, item.id, "venue")
                         }
                       />
                     ) : (
@@ -557,12 +559,12 @@ const UpdateEventForm = (props) => {
                     )}
                   </td>
                   <td>
-                    {editableRow === itemIndex ? (
+                    {editableId === item.id ? (
                       <input
                         type="text"
                         value={item.price_per_plate}
                         onChange={(e) =>
-                          handleTableChange(e, itemIndex, "price_per_plate")
+                          handleTableChange(e, item.id, "price_per_plate")
                         }
                       />
                     ) : (
@@ -570,14 +572,14 @@ const UpdateEventForm = (props) => {
                     )}
                   </td>
                   <td>
-                    {editableRow === itemIndex ? (
+                    {editableId === item.id ? (
                       <input
                         type="date"
                         value={moment(new Date(item.date_of_booking)).format(
                           "YYYY-MM-DD"
                         )}
                         onChange={(e) =>
-                          handleTableChange(e, itemIndex, "date_of_booking")
+                          handleTableChange(e, item.id, "date_of_booking")
                         }
                       />
                     ) : (
@@ -587,12 +589,12 @@ const UpdateEventForm = (props) => {
                     )}
                   </td>
                   <td>
-                    {editableRow === itemIndex ? (
+                    {editableId === item.id ? (
                       <input
                         type="text"
                         value={item.organizer}
                         onChange={(e) =>
-                          handleTableChange(e, itemIndex, "organizer")
+                          handleTableChange(e, item.id, "organizer")
                         }
                       />
                     ) : (
@@ -600,12 +602,12 @@ const UpdateEventForm = (props) => {
                     )}
                   </td>
                   <td>
-                    {editableRow === itemIndex ? (
+                    {editableId === item.id ? (
                       <input
                         type="text"
                         value={item.mobile_number}
                         onChange={(e) =>
-                          handleTableChange(e, itemIndex, "mobile_number")
+                          handleTableChange(e, item.id, "mobile_number")
                         }
                       />
                     ) : (
@@ -613,12 +615,12 @@ const UpdateEventForm = (props) => {
                     )}
                   </td>
                   <td>
-                    {editableRow === itemIndex ? (
+                    {editableId === item.id ? (
                       <input
                         type="text"
                         value={item.address}
                         onChange={(e) =>
-                          handleTableChange(e, itemIndex, "address")
+                          handleTableChange(e, item.id, "address")
                         }
                       />
                     ) : (
@@ -626,12 +628,12 @@ const UpdateEventForm = (props) => {
                     )}
                   </td>
                   <td>
-                    {editableRow === itemIndex ? (
+                    {editableId === item.id ? (
                       <input
                         type="number"
                         value={item.number_of_person}
                         onChange={(e) =>
-                          handleTableChange(e, itemIndex, "number_of_person")
+                          handleTableChange(e, item.id, "number_of_person")
                         }
                       />
                     ) : (
@@ -639,12 +641,12 @@ const UpdateEventForm = (props) => {
                     )}
                   </td>
                   <td>
-                    {editableRow === itemIndex ? (
+                    {editableId === item.id ? (
                       <input
                         type="text"
                         value={item.booking_amount}
                         onChange={(e) =>
-                          handleTableChange(e, itemIndex, "booking_amount")
+                          handleTableChange(e, item.id, "booking_amount")
                         }
                       />
                     ) : (
@@ -652,12 +654,12 @@ const UpdateEventForm = (props) => {
                     )}
                   </td>
                   <td>
-                    {editableRow === itemIndex ? (
+                    {editableId === item.id ? (
                       <input
                         type="text"
                         value={item.advance}
                         onChange={(e) =>
-                          handleTableChange(e, itemIndex, "advance")
+                          handleTableChange(e, item.id, "advance")
                         }
                       />
                     ) : (
@@ -665,12 +667,12 @@ const UpdateEventForm = (props) => {
                     )}
                   </td>
                   <td>
-                    {editableRow === itemIndex ? (
+                    {editableId === item.id ? (
                       <input
                         type="text"
                         value={item.balance}
                         onChange={(e) =>
-                          handleTableChange(e, itemIndex, "balance")
+                          handleTableChange(e, item.id, "balance")
                         }
                       />
                     ) : (
@@ -717,7 +719,7 @@ const UpdateEventForm = (props) => {
                       textAlign: "center",
                     }}
                   >
-                    {editableRow === itemIndex ? (
+                    {editableId === item.id ? (
                       <>
                         <Stack direction="horizontal" gap={1}>
                           <svg
@@ -727,7 +729,7 @@ const UpdateEventForm = (props) => {
                             fill="currentColor"
                             className="bi bi-check-lg p-2"
                             viewBox="0 0 16 16"
-                            onClick={() => handleSave(itemIndex)}
+                            onClick={() => handleSave(item.id)}
                           >
                             <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z" />
                           </svg>
@@ -738,7 +740,7 @@ const UpdateEventForm = (props) => {
                             fill="currentColor"
                             className="bi bi-x-circle p-2"
                             viewBox="0 0 16 16"
-                            onClick={() => cancelEdit(itemIndex)}
+                            onClick={() => cancelEdit(item.id)}
                           >
                             <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
                             <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
@@ -753,7 +755,7 @@ const UpdateEventForm = (props) => {
                         fill="currentColor"
                         className="bi bi-pencil-square"
                         viewBox="0 0 16 16"
-                        onClick={() => toggleEdit(itemIndex)}
+                        onClick={() => toggleEdit(item.id)}
                       >
                         <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
                         <path
@@ -800,7 +802,7 @@ const UpdateEventForm = (props) => {
                       fill="currentColor"
                       className="bi bi-trash"
                       viewBox="0 0 16 16"
-                      onClick={(e) => handleDelete(itemIndex)}
+                      onClick={(e) => handleDelete(item.id)}
                     >
                       <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z" />
                       <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z" />

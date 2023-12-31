@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import Table from "react-bootstrap/Table";
 import Form from "react-bootstrap/Form";
 import Stack from "react-bootstrap/Stack";
-
-const ReportTable = ({ data }) => {
+import * as XLSX from "xlsx";
+const CombinedReportTable = ({ data }) => {
   const [itemFilter, setItemFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
 
@@ -17,7 +17,13 @@ const ReportTable = ({ data }) => {
 
     return itemMatch && categoryMatch;
   });
-
+  const exportTable = () => {
+    const table = document.getElementById("eventTable");
+    const ws = XLSX.utils.table_to_sheet(table);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+    XLSX.writeFile(wb, "table.xlsx");
+  };
   return (
     <div>
       <Form>
@@ -43,8 +49,8 @@ const ReportTable = ({ data }) => {
           </Form.Group>
         </Stack>
       </Form>
-
-      <Table striped bordered hover responsive>
+      <h2>Combined Event Report Data</h2>
+      <Table striped bordered hover responsive id='eventTable'> 
         <thead>
           <tr>
             <th>Item</th>
@@ -68,8 +74,9 @@ const ReportTable = ({ data }) => {
           ))}
         </tbody>
       </Table>
+      <button onClick={exportTable}>Export to Excel</button>
     </div>
   );
 };
 
-export default ReportTable;
+export default CombinedReportTable;
