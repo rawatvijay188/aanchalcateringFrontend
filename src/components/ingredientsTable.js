@@ -20,6 +20,7 @@ const IngredientTable = () => {
       var response = await lambdaCall({
         service: "get_unique_ingredient_categories",
       });
+      console.log(response.data)
       setIngredientsCategories(response.data);
     }
     fetchIngredientsCategories();

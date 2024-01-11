@@ -21,6 +21,7 @@ const MenuTable = () => {
       var response = await lambdaCall({
         service: "get_unique_menu_categories",
       });
+      console.log(response.data)
       setMenuCategories(response.data);
     }
     fetchMenuCategories();

@@ -126,19 +126,18 @@ const UpdateEventForm = (props) => {
   const cancelEdit = (eventId) => {
     setEditableId(null);
     var updatedData = [...eventDetails];
-    const index = updatedData.findIndex(item => item.id === eventId);
+    const index = updatedData.findIndex((item) => item.id === eventId);
     updatedData[index] = oldData;
     setEventDetails(updatedData);
     setChangeCheck(false);
   };
   const handleTableChange = (e, eventId, field) => {
     const updatedData = [...eventDetails];
-    const index = updatedData.findIndex(item => item.id === eventId);
+    const index = updatedData.findIndex((item) => item.id === eventId);
     if (field === "select") {
       // Handle checkbox changes
       const isChecked = e.target.checked;
       if (isChecked) {
-        
         var id = updatedData[index]["id"];
         setSelectedId(id);
         console.log("Selected ID:", id);
@@ -188,7 +187,7 @@ const UpdateEventForm = (props) => {
     });
     refresh();
     alert(
-      `Copied the Event successfully and the new event id is ${result.data[0].id}`
+      `Copied the Event successfully and the new event id is ${result.data.id}`
     );
   };
   const filterEventDetails = (e, field) => {
@@ -490,9 +489,7 @@ const UpdateEventForm = (props) => {
                     <Form.Check
                       type={"checkbox"}
                       id={item.id}
-                      onChange={(e) =>
-                        handleTableChange(e, item.id, "select")
-                      }
+                      onChange={(e) => handleTableChange(e, item.id, "select")}
                       checked={item.id === selectedId}
                     />
                   </td>
@@ -550,9 +547,7 @@ const UpdateEventForm = (props) => {
                       <input
                         type="text"
                         value={item.venue}
-                        onChange={(e) =>
-                          handleTableChange(e, item.id, "venue")
-                        }
+                        onChange={(e) => handleTableChange(e, item.id, "venue")}
                       />
                     ) : (
                       item.venue
