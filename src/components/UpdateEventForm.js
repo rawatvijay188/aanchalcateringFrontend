@@ -400,9 +400,11 @@ const UpdateEventForm = (props) => {
 
       {filteredEventDetails && filteredEventDetails.length > 0 && (
         <>
-          <Button variant="primary" onClick={() => copyEventDetails()}>
-            Copy
-          </Button>
+          {selectedId > 0 && (
+            <Button variant="primary" onClick={() => copyEventDetails()}>
+              Copy
+            </Button>
+          )}
 
           <Table striped bordered hover responsive className="mt-4">
             <thead>
