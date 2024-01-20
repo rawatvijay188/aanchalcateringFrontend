@@ -282,13 +282,25 @@ const UpdateEventForm = (props) => {
           </Form.Group>
         </Row>
         <Row className="mb-3">
-          <Form.Group as={Col} controlId="mobile_number">
+          <Form.Group as={Col} controlId="mobile_number" md={6}>
             <Form.Label>Mobile Number</Form.Label>
             <Form.Control
               type="text"
               onChange={handleFormChange}
               placeholder="Enter Mobile Number"
             />
+          </Form.Group>
+        </Row>
+        <Row className="mb-3">
+          <Form.Group as={Col} controlId="date_type">
+            <Form.Label>Date Type</Form.Label>
+            <Form.Select
+              onChange={handleFormChange}
+              aria-label="Default select example"
+            >
+              <option value="date_of_booking">Date Of Booking</option>
+              <option value="date_of_function">Date Of Function</option>
+            </Form.Select>
           </Form.Group>
           <Form.Group as={Col} controlId="from_date">
             <Form.Label>From Date</Form.Label>
@@ -305,16 +317,6 @@ const UpdateEventForm = (props) => {
               onChange={handleFormChange}
               placeholder="Select To Date"
             />
-          </Form.Group>
-          <Form.Group as={Col} controlId="date_type">
-            <Form.Label>Date Type</Form.Label>
-            <Form.Select
-              onChange={handleFormChange}
-              aria-label="Default select example"
-            >
-              <option value="date_of_booking">Date Of Booking</option>
-              <option value="date_of_function">Date Of Function</option>
-            </Form.Select>
           </Form.Group>
         </Row>
         <Stack gap={2} direction="horizontal" className="col-md-2 mx-auto">
