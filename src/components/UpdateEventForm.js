@@ -326,75 +326,78 @@ const UpdateEventForm = (props) => {
           </Button>
         </Stack>
       </Form>
-      <Row className="mb-3">
-        <Form.Group as={Col} controlId="eventTitleFilter">
-          <Form.Label>Filter Event Title</Form.Label>
-          <Form.Control
-            type="text"
-            onChange={(e) => {
-              filterEventDetails(e, "eventTitleFilter");
-            }}
-            value={filterValues.eventTitleFilter}
-            placeholder="Filter Event Title"
-          />
-        </Form.Group>
-        <Form.Group as={Col} controlId="eventTypeFilter">
-          <Form.Label>Filter Event Type</Form.Label>
-          <Form.Control
-            type="text"
-            onChange={(e) => {
-              filterEventDetails(e, "eventTypeFilter");
-            }}
-            value={filterValues.eventTypeFilter}
-            placeholder="Filter Event Type"
-          />
-        </Form.Group>
-        <Form.Group as={Col} controlId="venueFilter">
-          <Form.Label>Filter Venue</Form.Label>
-          <Form.Control
-            type="text"
-            onChange={(e) => {
-              filterEventDetails(e, "venueFilter");
-            }}
-            value={filterValues.venueFilter}
-            placeholder="Filter Venue"
-          />
-        </Form.Group>
-        <Form.Group as={Col} controlId="organizerNameFilter">
-          <Form.Label>Filter Organizer Name</Form.Label>
-          <Form.Control
-            type="text"
-            onChange={(e) => {
-              filterEventDetails(e, "organizerNameFilter");
-            }}
-            value={filterValues.organizerNameFilter}
-            placeholder="Filter Organizer Name"
-          />
-        </Form.Group>
-        <Form.Group as={Col} controlId="mobileNumberFilter">
-          <Form.Label>Filter Mobile Number</Form.Label>
-          <Form.Control
-            type="text"
-            onChange={(e) => {
-              filterEventDetails(e, "mobileNumberFilter");
-            }}
-            value={filterValues.mobileNumberFilter}
-            placeholder="Filter Mobile Number"
-          />
-        </Form.Group>
-        <Form.Group as={Col} controlId="addressFilter">
-          <Form.Label>Filter Address</Form.Label>
-          <Form.Control
-            type="text"
-            onChange={(e) => {
-              filterEventDetails(e, "addressFilter");
-            }}
-            value={filterValues.addressFilter}
-            placeholder="Filter address"
-          />
-        </Form.Group>
-        {/* Repeat the above Form.Group structure for other filters */}
-      </Row>
+      {eventDetails.length > 1 && (
+        <Row className="mb-3">
+          <Form.Group as={Col} controlId="eventTitleFilter">
+            <Form.Label>Filter Event Title</Form.Label>
+            <Form.Control
+              type="text"
+              onChange={(e) => {
+                filterEventDetails(e, "eventTitleFilter");
+              }}
+              value={filterValues.eventTitleFilter}
+              placeholder="Filter Event Title"
+            />
+          </Form.Group>
+          <Form.Group as={Col} controlId="eventTypeFilter">
+            <Form.Label>Filter Event Type</Form.Label>
+            <Form.Control
+              type="text"
+              onChange={(e) => {
+                filterEventDetails(e, "eventTypeFilter");
+              }}
+              value={filterValues.eventTypeFilter}
+              placeholder="Filter Event Type"
+            />
+          </Form.Group>
+          <Form.Group as={Col} controlId="venueFilter">
+            <Form.Label>Filter Venue</Form.Label>
+            <Form.Control
+              type="text"
+              onChange={(e) => {
+                filterEventDetails(e, "venueFilter");
+              }}
+              value={filterValues.venueFilter}
+              placeholder="Filter Venue"
+            />
+          </Form.Group>
+          <Form.Group as={Col} controlId="organizerNameFilter">
+            <Form.Label>Filter Organizer Name</Form.Label>
+            <Form.Control
+              type="text"
+              onChange={(e) => {
+                filterEventDetails(e, "organizerNameFilter");
+              }}
+              value={filterValues.organizerNameFilter}
+              placeholder="Filter Organizer Name"
+            />
+          </Form.Group>
+          <Form.Group as={Col} controlId="mobileNumberFilter">
+            <Form.Label>Filter Mobile Number</Form.Label>
+            <Form.Control
+              type="text"
+              onChange={(e) => {
+                filterEventDetails(e, "mobileNumberFilter");
+              }}
+              value={filterValues.mobileNumberFilter}
+              placeholder="Filter Mobile Number"
+            />
+          </Form.Group>
+          <Form.Group as={Col} controlId="addressFilter">
+            <Form.Label>Filter Address</Form.Label>
+            <Form.Control
+              type="text"
+              onChange={(e) => {
+                filterEventDetails(e, "addressFilter");
+              }}
+              value={filterValues.addressFilter}
+              placeholder="Filter address"
+            />
+          </Form.Group>
+          {/* Repeat the above Form.Group structure for other filters */}
+        </Row>
+      )}
+
       {filteredEventDetails && filteredEventDetails.length > 0 && (
         <>
           <Button variant="primary" onClick={() => copyEventDetails()}>
