@@ -13,14 +13,72 @@ const ViewBill = (props) => {
         service: "get_bill_by_id",
         billId: props.billId,
       };
-      console.log(body)
+      console.log(body);
       var data = await lambdaCall(body);
       setInvoiceData(data.data[0]);
     }
     BillDetails();
   }, [props.billId]);
 
+  // const exportPDF = () => {
+  //   console.log({ invoiceData });
+  //   const unit = "pt";
+  //   const size = "A4";
+  //   const orientation = "portrait";
+  //   const marginLeft = 40;
+  //   const doc = new jsPDF(orientation, unit, size);
+
+  //   doc.setFontSize(15);
+
+  //   const title = "Invoice Details";
+
+  //   const headers = ["Description", "Quantity", "Rate", "Amount"];
+  //   const data = invoiceData.items.map((item) => [
+  //     item.description,
+  //     item.quantity,
+  //     item.rate,
+  //     item.amount,
+  //   ]);
+
+  //   const content = {
+  //     startY: 50,
+  //     head: [headers],
+  //     body: data,
+  //   };
+
+  //   // Use the autotable plugin to generate the table
+  //   autoTable(doc, content);
+  //   doc.text(
+  //     `Customer Name: ${invoiceData.customer_name}`,
+  //     marginLeft,
+  //     doc.previousAutoTable.finalY + 80
+  //   );
+  //   doc.text(
+  //     `Date: ${invoiceData.date}`,
+  //     marginLeft,
+  //     doc.previousAutoTable.finalY + 110
+  //   );
+  //   doc.text(
+  //     `Total: ${invoiceData.amount_details.total}`,
+  //     marginLeft,
+  //     doc.previousAutoTable.finalY + 140
+  //   );
+  //   doc.text(
+  //     `Advance: ${invoiceData.amount_details.advance}`,
+  //     marginLeft,
+  //     doc.previousAutoTable.finalY + 170
+  //   );
+  //   doc.text(
+  //     `Balance: ${invoiceData.amount_details.balance}`,
+  //     marginLeft,
+  //     doc.previousAutoTable.finalY + 200
+  //   );
+
+  //   doc.save("invoice.pdf");
+  // };
+
   const exportPDF = () => {
+    console.log({ invoiceData });
     const unit = "pt";
     const size = "A4";
     const orientation = "portrait";
@@ -31,8 +89,6 @@ const ViewBill = (props) => {
 
     const title = "Invoice Details";
 
-    doc.text(title, marginLeft, 40);
-
     const headers = ["Description", "Quantity", "Rate", "Amount"];
     const data = invoiceData.items.map((item) => [
       item.description,
@@ -42,7 +98,7 @@ const ViewBill = (props) => {
     ]);
 
     const content = {
-      startY: 50,
+      startY: 130, // Adjust the startY value to place the table below the date
       head: [headers],
       body: data,
     };
@@ -50,25 +106,27 @@ const ViewBill = (props) => {
     // Use the autotable plugin to generate the table
     autoTable(doc, content);
 
+    // Adjust Y positions for other details
+    doc.text(`Customer Name: ${invoiceData.customer_name}`, marginLeft, 80);
     doc.text(
-      `Subtotal: ${invoiceData.amount_details.subtotal}`,
+      `Date: ${invoiceData.date}`,
       marginLeft,
-      doc.previousAutoTable.finalY + 50
+      110 // Adjust the Y position for the date
     );
     doc.text(
       `Total: ${invoiceData.amount_details.total}`,
       marginLeft,
-      doc.previousAutoTable.finalY + 80
+      doc.previousAutoTable.finalY + 30
     );
     doc.text(
       `Advance: ${invoiceData.amount_details.advance}`,
       marginLeft,
-      doc.previousAutoTable.finalY + 110
+      doc.previousAutoTable.finalY + 60
     );
     doc.text(
       `Balance: ${invoiceData.amount_details.balance}`,
       marginLeft,
-      doc.previousAutoTable.finalY + 140
+      doc.previousAutoTable.finalY + 90
     );
 
     doc.save("invoice.pdf");
@@ -107,7 +165,6 @@ const ViewBill = (props) => {
           </Table>
 
           <h3>Financial Summary</h3>
-          <p>Subtotal: {invoiceData.amount_details.subtotal}</p>
           <p>Total: {invoiceData.amount_details.total}</p>
           <p>Advance: {invoiceData.amount_details.advance}</p>
           <p>Balance: {invoiceData.amount_details.balance}</p>
